@@ -23,15 +23,23 @@ def readInputThreaded(so):
     global nickname
     nick = raw_input()
     nickname = nick
-    print nickname + "==> "
+
     while 1:
 
-
+        print nickname + "==> "
         text = raw_input()
 
+        if "<changenick>" in text:
+            print "enter a nickname"
+            nickname = raw_input()
+        if "<" in text:
+            so.sendall(str(text))
+        else:
+            so.sendall(str(":"+nickname+"-"+text))
 
 
-        so.sendall(str(text))
+
+
 
 
 
@@ -49,6 +57,7 @@ def readFromServer(s):
 
     while 1:
         data = s.recv(100)
+        print data
         #:User Name-"Message">
         if ":" in data:
             time = strftime("( %H:%M:%S) ", gmtime())
@@ -56,14 +65,13 @@ def readFromServer(s):
             Nmess= Nmess.split('-')
             #global nickname
             nickname = Nmess[0]
-            print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
+            #print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
         elif "<getservertime>" in data:
             print "command in data.."
             formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
             print(str(formatted))
         elif "<time>" in data:
-            time= strftime(" %H:%M:%S +0000", gmtime())
-            print(str(time))
+            print(str(data))
         elif "<dates>" in data:
             dates=strftime("%a, %d %b %Y", gmtime())
             print(str(dates))
@@ -77,6 +85,7 @@ def readFromServer(s):
             nickname = nick
         #    new = nickname
             print nickname + " want to change "
+
         #nickname = new
             #print("Old nickname = " + nickname + " new nickname = " + NewNick)
 

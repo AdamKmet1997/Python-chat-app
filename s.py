@@ -29,6 +29,7 @@ def sayHello():
 # command it will then need to extract the command.
 def parseInput(data, con):
     print "parsing..."
+
     #print str(data)
 
     # Checking for commands
@@ -38,9 +39,11 @@ def parseInput(data, con):
         #con.send(str(formatted))
         print " user requested server date and time "
 
-    elif "<time>" in data:
-        time= strftime(" %H:%M:%S +0000", gmtime())
-        #con.send(str(time))
+    if "<time>" in data:
+        time = strftime(" %H %M %S +0000", gmtime())
+        t= str("time is" + time)
+        print t
+        con.send(t)
         print " user requested time"
     elif "<dates>" in data:
         dates=strftime("%a, %d %b %Y", gmtime())
