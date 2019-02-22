@@ -85,6 +85,11 @@ def readFromServer(s):
             nickname = nick
         #    new = nickname
             print nickname + " want to change "
+        elif "<help>" in data:
+            print "<time>"
+            print "<dates>"
+            print "<getservertime>"
+            print "<ping>"
 
         #nickname = new
             #print("Old nickname = " + nickname + " new nickname = " + NewNick)
