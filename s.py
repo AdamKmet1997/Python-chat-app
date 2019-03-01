@@ -83,8 +83,8 @@ def manageConnection(conn, addr):
 
     while 1:
         data = conn.recv(1024)
-
-        parseInput(data,conn)# Calling the parser
+        if data != "":
+            parseInput(data,conn)# Calling the parser
 
     #    print "rec:" + str(data)
 

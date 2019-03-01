@@ -36,6 +36,12 @@ def readInputThreaded(so):
             so.sendall(str(text))
         else:
             so.sendall(str(":"+nickname+"-"+text))
+        if "<close>" in text:
+            try:
+                so.close()
+                break
+            except Exception:
+                print "Error"
 
 
 
@@ -90,6 +96,12 @@ def readFromServer(s):
             print "<dates>"
             print "<getservertime>"
             print "<ping>"
+        elif "<close>" in data:
+            try:
+                s.close()
+                break
+            except Exception:
+                print "Error"
 
         #nickname = new
             #print("Old nickname = " + nickname + " new nickname = " + NewNick)
