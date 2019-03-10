@@ -3,6 +3,7 @@ import threading
 import socket
 from time import gmtime, strftime
 import time
+import json
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
@@ -12,7 +13,14 @@ PORT = 50007          # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
+# method tp save messages into the file .json
+def writeToJsonFile(path,fileName,dat):
+    filePath = './' + path + './' +fileName + '.json'
+    with open(filePath, 'w') as fp:
+        json.dump(dat , fp)
 
+path = './'
+fileName = 'example2'
 # when we send data to the server, we are using a colon
 # at the end of a sentence to mark the end of the current sentence
 # later when the input comes back, we will then be breaking the input
@@ -23,6 +31,7 @@ def readInputThreaded(so):
     global nickname
     nick = raw_input()
     nickname = nick
+
 
     while 1:
 
@@ -42,12 +51,6 @@ def readInputThreaded(so):
                 break
             except Exception:
                 print "Error"
-
-
-
-
-
-
 
 
 t = threading.Thread(target=readInputThreaded, args = (s,))
@@ -102,6 +105,7 @@ def readFromServer(s):
                 break
             except Exception:
                 print "Error"
+        writeToJsonFile(path,fileName,data)
 
         #nickname = new
             #print("Old nickname = " + nickname + " new nickname = " + NewNick)

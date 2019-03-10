@@ -2,6 +2,8 @@ import socket
 import threading, Queue
 from time import gmtime, strftime
 import time
+import json
+
 
 
 HOST = '127.0.0.1'
@@ -24,6 +26,13 @@ def sayHello():
     print "----> The hello function was called"
 
 
+# def writeToJsonFile(path,fileName,data):
+#     filePath = './' + path + './' +fileName + '.json'
+#     with open(filePath, 'w') as fp:
+#         json.dump(data , fp)
+
+path = './'
+fileName = 'example2'
 # sample parser function. The job of this function is to take some input
 # data and search to see if a command is present in the text. If it finds a
 # command it will then need to extract the command.
@@ -63,6 +72,7 @@ def parseInput(data, con):
     #    print("user has left the chat")
     elif "ping" in data:
         print("pong")
+     # writeToJsonFile(path,fileName,data)
 
 
 
@@ -90,6 +100,7 @@ def manageConnection(conn, addr):
 
         for singleClient in currentConnections:
             singleClient.send(str(data))
+
 
 
     #conn.close()
