@@ -14,10 +14,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
 # method tp save messages into the file .json
-def writeToJsonFile(path,fileName,dat):
-    filePath = './' + path + './' +fileName + '.json'
-    with open(filePath, 'w') as fp:
-        json.dump(dat , fp)
+# def writeToJsonFile(path,fileName,dat):
+#     filePath = './' + path + './' +fileName + '.json'
+#     with open(filePath, 'w') as fp:
+#         json.dump(dat , fp)
 
 path = './'
 fileName = 'example2'
@@ -51,6 +51,7 @@ def readInputThreaded(so):
                 break
             except Exception:
                 print "Error"
+        # writeToJsonFile(path,fileName,text)
 
 
 t = threading.Thread(target=readInputThreaded, args = (s,))
@@ -105,7 +106,7 @@ def readFromServer(s):
                 break
             except Exception:
                 print "Error"
-        writeToJsonFile(path,fileName,data)
+
 
         #nickname = new
             #print("Old nickname = " + nickname + " new nickname = " + NewNick)

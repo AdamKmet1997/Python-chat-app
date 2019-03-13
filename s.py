@@ -27,9 +27,8 @@ def sayHello():
 
 
 # def writeToJsonFile(path,fileName,data):
-#     filePath = './' + path + './' +fileName + '.json'
-#     with open(filePath, 'w') as fp:
-#         json.dump(data , fp)
+#     with open('example2.json','w') as f:
+#         json.dump(data, f, indent=2)
 
 path = './'
 fileName = 'example2'
@@ -72,7 +71,8 @@ def parseInput(data, con):
     #    print("user has left the chat")
     elif "ping" in data:
         print("pong")
-     # writeToJsonFile(path,fileName,data)
+
+    # writeToJsonFile(path,fileName,data)
 
 
 
@@ -96,10 +96,21 @@ def manageConnection(conn, addr):
         if data != "":
             parseInput(data,conn)# Calling the parser
 
+
     #    print "rec:" + str(data)
 
         for singleClient in currentConnections:
             singleClient.send(str(data))
+
+            #open json file and read the value
+        # with open('example2.json', 'r') as f:
+        #     f=json.load(f)#store it in f
+
+        for newJ in data:
+            #open json
+            with open('example2.json','w') as f:
+                json.dump(data, f, indent=2)
+
 
 
 
