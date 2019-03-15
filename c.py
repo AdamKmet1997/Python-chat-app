@@ -104,14 +104,6 @@ def main():
                 end = datetime.now()
                 timeTaken = end - lastPing
                 print("Ping successfull. Time taken: " + str(timeTaken))
-            elif "<changenickname " in data:
-                print("Changing nickname!")
-                tagless = data[1:-1]
-                splitMessage = tagless.split(' ')
-                command = splitMessage[0]
-                newnick = splitMessage[1]
-                nickname = newnick
-                print("Nickname: " + nickname)
             elif "<help>" in data:
                 print "<time>"
                 print "<dates>"
