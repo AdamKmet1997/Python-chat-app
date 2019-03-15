@@ -14,7 +14,7 @@ PORT = 50007          # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 mylist = list()
-
+nickname = 'NO_NICKNAME'
 lastPing = datetime.now()
 
 
@@ -33,7 +33,6 @@ lastPing = datetime.now()
 nickname =''
 def readInputThreaded(so):
     print " Set your nickname"
-    global nickname
     nick = raw_input()
     nickname = nick
 
