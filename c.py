@@ -35,7 +35,7 @@ def readInputThreaded(so):
     print " Set your nickname"
     nick = raw_input()
     nickname = nick
-
+    so.sendall("<newclient "+nickname+">")
 
     while 1:
 

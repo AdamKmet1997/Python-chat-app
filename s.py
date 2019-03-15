@@ -62,12 +62,13 @@ def parseInput(data, con):
         dates=strftime("%a, %d %b %Y", gmtime())
     #    con.send(str(dates))
         print " user requested date"
-    elif "<changeNickname " in data:
+    elif "<newclient " in data:
         tagless = data[1:-1]
         splitMessage = tagless.split(' ')
         command = splitMessage[0];
-        newNickname = splitMessage[1]
-        print(con)
+        newclient = splitMessage[1]
+        clients[newclient] = con
+        print(clients)
 
     #:User Name-"Message">
 
