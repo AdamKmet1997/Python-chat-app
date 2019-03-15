@@ -11,8 +11,10 @@ PORT = 50007
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 mylist = list()
-
 currentConnections = list()
+clients = {
+
+}
 
 
 # This is the buffer string
@@ -38,6 +40,8 @@ def sayHello():
 # command it will then need to extract the command.
 def parseInput(data, con):
     print "parsing..."
+    print(currentConnections)
+    print(buffer)
 
     #print str(data)
 
@@ -58,6 +62,12 @@ def parseInput(data, con):
         dates=strftime("%a, %d %b %Y", gmtime())
     #    con.send(str(dates))
         print " user requested date"
+    elif "<changeNickname " in data:
+        tagless = data[1:-1]
+        splitMessage = tagless.split(' ')
+        command = splitMessage[0];
+        newNickname = splitMessage[1]
+        print(con)
 
     #:User Name-"Message">
 
@@ -70,12 +80,13 @@ def parseInput(data, con):
         print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
     #elif "<leave>" in data:
     #    print("user has left the chat")
-    elif "ping" in data:
-        print("pong")
+    elif "<ping>" in data:
+        con.send("<pong>")
     elif "<show>" in data:
         print mylist
     # writeToJsonFile(path,fileName,data)
-
+    elif "<connected>" in data:
+        print currentConnections
 
 
 

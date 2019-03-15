@@ -2,6 +2,7 @@ import threading
 # Echo client program
 import socket
 from time import gmtime, strftime
+from datetime import datetime
 import time
 import json
 
@@ -13,6 +14,9 @@ PORT = 50007          # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 mylist = list()
+
+lastPing = datetime.now()
+
 
 # method tp save messages into the file .json
 # def writeToJsonFile(path,fileName,dat):
@@ -28,7 +32,7 @@ mylist = list()
 # into individual parts using the colon : to separate the lines
 nickname =''
 def readInputThreaded(so):
-    print " set your nickname"
+    print " Set your nickname"
     global nickname
     nick = raw_input()
     nickname = nick
@@ -38,6 +42,9 @@ def readInputThreaded(so):
 
         print nickname + "==> "
         text = raw_input()
+        if "<ping>" in text:
+            lastPing = datetime.now()
+            so.sendall(str(text))
 
         if "<changenick>" in text:
             print "enter a nickname"
@@ -90,8 +97,10 @@ def readFromServer(s):
             print(str(dates))
         #elif "<leave>" in data:
         #    s.close()
-        elif "ping" in data:
-            print("pong")
+        elif "<pong>" in data:
+            end = datetime.now()
+            timeTaken = end - lastPing
+            print("Ping successfull. Time taken: " + str(timeTaken))
         elif "<change>" in data:# cant figure out how to change nickname
             print " set your new nickname"
             nick = raw_input()
