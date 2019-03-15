@@ -13,7 +13,7 @@ s.bind((HOST, PORT))
 mylist = list()
 currentConnections = list()
 clients = {
-
+    #e.g:  'Daniel': connectionOBJECT
 }
 
 
@@ -27,6 +27,13 @@ buffer = ""
 # custom say hello command
 def sayHello():
     print "----> The hello function was called"
+def getClientCon(name):
+    clientCon = clients[name]
+    return clientCon
+def getClientName(con):
+    clientName =  clients.keys()[clients.values().index(conn)]
+    return clientName
+
 
 
 # # def writeToJsonFile(path,fileName,data):
@@ -40,8 +47,7 @@ def sayHello():
 # command it will then need to extract the command.
 def parseInput(data, con):
     print "parsing..."
-    print(currentConnections)
-    print(buffer)
+
 
     #print str(data)
 
@@ -62,29 +68,37 @@ def parseInput(data, con):
         dates=strftime("%a, %d %b %Y", gmtime())
     #    con.send(str(dates))
         print " user requested date"
-    elif "<newclient " in data:
+    elif "<newclient " in data: #<newclient Daniel>
         tagless = data[1:-1]
         splitMessage = tagless.split(' ')
-        command = splitMessage[0];
+        command = splitMessage[0]
         newclient = splitMessage[1]
         clients[newclient] = con
         print(clients)
-
+        print("Get client name:" + getClientName(con))
+    elif "<changenickname " in data: #<changenick Daniel>
+        tagless = data[1:-1]
+        splitMessage = tagless.split(' ')
+        command = splitMessage[0]
+        newnick = splitMessage[1]
+        del clients[getClientName(con)] #Removes client value
+        clients[newnick] = con # Adds a client value based on new nickname
+        print(clients)
+        #con.send('<changenickname '+newnick+'>')
     #:User Name-"Message">
 
     elif ":" in data:
         time = strftime("( %H:%M:%S) ", gmtime())
         Nmess= data.replace(':','')
         Nmess= Nmess.split('-')
-        #global nickname
         nickname = Nmess[0]
         print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
     #elif "<leave>" in data:
     #    print("user has left the chat")
     elif "<ping>" in data:
         con.send("<pong>")
-    elif "<show>" in data:
-        print mylist
+    elif "<showclients>" in data:
+        con.send(str(clients))
     # writeToJsonFile(path,fileName,data)
     elif "<connected>" in data:
         print currentConnections
