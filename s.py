@@ -10,6 +10,7 @@ HOST = '127.0.0.1'
 PORT = 50007
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
+mylist = list()
 
 currentConnections = list()
 
@@ -26,12 +27,12 @@ def sayHello():
     print "----> The hello function was called"
 
 
-# def writeToJsonFile(path,fileName,data):
-#     with open('example2.json','w') as f:
-#         json.dump(data, f, indent=2)
-
-path = './'
-fileName = 'example2'
+# # def writeToJsonFile(path,fileName,data):
+# #     with open('example2.json','w') as f:
+# #         json.dump(data, f, indent=2)
+#
+# path = './'
+# fileName = 'example2'
 # sample parser function. The job of this function is to take some input
 # data and search to see if a command is present in the text. If it finds a
 # command it will then need to extract the command.
@@ -71,7 +72,8 @@ def parseInput(data, con):
     #    print("user has left the chat")
     elif "ping" in data:
         print("pong")
-
+    elif "<show>" in data:
+        print mylist
     # writeToJsonFile(path,fileName,data)
 
 
@@ -85,7 +87,9 @@ def parseInput(data, con):
 def manageConnection(conn, addr):
     global buffer
     global currentConnections
+    global mylist
     print 'Connected by', addr
+
 
     # add the new connection to the list of connections
     currentConnections.append(conn)
@@ -101,15 +105,9 @@ def manageConnection(conn, addr):
 
         for singleClient in currentConnections:
             singleClient.send(str(data))
-
-            #open json file and read the value
-        # with open('example2.json', 'r') as f:
-        #     f=json.load(f)#store it in f
-
-        for newJ in data:
-            #open json
-            with open('example2.json','w') as f:
-                json.dump(data, f, indent=2)
+        #store messages in a list called mylist
+        mylist.append(data)
+        print mylist
 
 
 
