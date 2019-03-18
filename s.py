@@ -1,5 +1,6 @@
 import socket
 import threading, Queue
+import hashlib
 from time import gmtime, strftime
 import time
 import json
@@ -60,87 +61,99 @@ def messageInfo(message):
 def messageMsg(message):
     message = "<msg>"+message+"</msg>"
     return message
+def verifyHash(data):
+    split = data.split('-')
+    firstHash = split[0]
+    secondHash = split[1]
+    firstHash = firstHash[6:-1]
 
-# # def writeToJsonFile(path,fileName,data):
-# #     with open('example2.json','w') as f:
-# #         json.dump(data, f, indent=2)
-#
-# path = './'
-# fileName = 'example2'
-# sample parser function. The job of this function is to take some input
-# data and search to see if a command is present in the text. If it finds a
-# command it will then need to extract the command.
+    hash = hashlib.md5()
+    hash.update(secondHash)
+    secondHash = hash.hexdigest()
+    print("First:" + firstHash)
+    print("Second:" + secondHash)
+    if firstHash == secondHash:
+        return 1
+    else:
+        return 0
+def stripHash(data):
+    data = data.split('-', 1)
+    stripped = data[1]
+    print("Data: " +stripped)
+    return stripped
+
 print("Server started.")
+m = hashlib.md5()
 
 def parseInput(data, con):
     global buffer
     print "parsing..."
 
+    if verifyHash(data) == 1:
+        data = stripHash(data)
 
-    #print str(data)
-
-    # Checking for commands
-    if "<servertime>" in data:
-        formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-        con.send(messageInfo(str(formatted)))
-    if "<time>" in data:
-        time = strftime("%H:%M:%S", gmtime())
-        timeString = str("Time: " + time)
-        con.send(messageInfo(timeString))
-    elif "<date>" in data:
-        date=strftime("%a, %d %b %Y", gmtime())
-        con.send(messageInfo(str(date)))
-    elif "<newclient " in data: #<newclient Daniel>
-        tagless = data[1:-1]
-        splitMessage = tagless.split(' ')
-        command = splitMessage[0]
-        newclient = splitMessage[1]
-        clients[newclient] = con
-        messageAll(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected."))
-    elif "<changenickname " in data: #<changenick Daniel>
-        oldnick = getClientName(con)
-        tagless = data[1:-1]
-        splitMessage = tagless.split(' ')
-        command = splitMessage[0]
-        newnick = splitMessage[1]
-        del clients[getClientName(con)] #Removes client value
-        clients[newnick] = con # Adds a client value based on new nickname
-        messageAll(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'." ))
-    elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
-        timestamp = getTimestamp()
-        tagless = data[6:-7]
-        buffer = buffer + tagless + ":"
-        splitMessage = tagless.split('~')
-        user = splitMessage[0]
-        message = splitMessage[1]
-        print("Message received")
-        messageAll(messageMsg(timestamp+" "+user+": " + message))
-    elif "<ping>" in data:
-        con.send("<pong>")
-    elif "<connected>" in data:
-        con.send(messageInfo(getClientList()))
-    elif "<kick " in data:
-        kicker = getClientName(con)
-        tagless = data[1:-1]
-        splitMessage = tagless.split(' ')
-        command = splitMessage[0]
-        user = splitMessage[1]
-        usercon = getClientCon(user)
-        usercon.send(messageInfo("[ANNOUNCEMENT] You have been kicked by "+kicker+"."))
-        usercon.send('<close>')
-        messageAll(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'."))
-        del clients[user]
-        currentConnections.remove(usercon)
-    elif "<messages>" in data:
-        messageAll(messageInfo("Message count: "+str(getMessageCount())))
-    elif "<roomname>" in data:
-        con.send(messageInfo("You are currently connected to \'"+getChatName()+"\'."))
-    elif "<changeroomname " in data:
-        oldname = getChatName()
-        user = getClientName(con)
-        newname = data[16:-1]
-        messageAll(messageInfo("The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+"."))
-
+        if "<servertime>" in data:
+            formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+            con.send(messageInfo(str(formatted)))
+        if "<time>" in data:
+            time = strftime("%H:%M:%S", gmtime())
+            timeString = str("Time: " + time)
+            con.send(messageInfo(timeString))
+        elif "<date>" in data:
+            date=strftime("%a, %d %b %Y", gmtime())
+            con.send(messageInfo(str(date)))
+        elif "<newclient " in data: #<newclient Daniel>
+            tagless = data[1:-1]
+            splitMessage = tagless.split(' ')
+            command = splitMessage[0]
+            newclient = splitMessage[1]
+            clients[newclient] = con
+            messageAll(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected."))
+        elif "<changenickname " in data: #<changenick Daniel>
+            oldnick = getClientName(con)
+            tagless = data[1:-1]
+            splitMessage = tagless.split(' ')
+            command = splitMessage[0]
+            newnick = splitMessage[1]
+            del clients[getClientName(con)] #Removes client value
+            clients[newnick] = con # Adds a client value based on new nickname
+            messageAll(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'." ))
+        elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
+            timestamp = getTimestamp()
+            tagless = data[6:-7]
+            buffer = buffer + tagless + ":"
+            splitMessage = tagless.split('~')
+            user = splitMessage[0]
+            message = splitMessage[1]
+            print("Message received")
+            messageAll(messageMsg(timestamp+" "+user+": " + message))
+        elif "<ping>" in data:
+            con.send("<pong>")
+        elif "<connected>" in data:
+            con.send(messageInfo(getClientList()))
+        elif "<kick " in data:
+            kicker = getClientName(con)
+            tagless = data[1:-1]
+            splitMessage = tagless.split(' ')
+            command = splitMessage[0]
+            user = splitMessage[1]
+            usercon = getClientCon(user)
+            usercon.send(messageInfo("[ANNOUNCEMENT] You have been kicked by "+kicker+"."))
+            usercon.send('<close>')
+            messageAll(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'."))
+            del clients[user]
+            currentConnections.remove(usercon)
+        elif "<messages>" in data:
+            messageAll(messageInfo("Message count: "+str(getMessageCount())))
+        elif "<roomname>" in data:
+            con.send(messageInfo("You are currently connected to \'"+getChatName()+"\'."))
+        elif "<changeroomname " in data:
+            oldname = getChatName()
+            user = getClientName(con)
+            newname = data[16:-1]
+            messageAll(messageInfo("The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+"."))
+    else:
+        print("Hashes do not match!")
 # we a new thread is started from an incoming connection
 # the manageConnection funnction is used to take the input
 # and print it out on the server
@@ -170,10 +183,6 @@ def manageConnection(conn, addr):
         mylist.append(data)
         print mylist
 
-
-
-
-    #conn.close()
 
 
 while 1:

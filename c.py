@@ -1,6 +1,6 @@
 import threading
-# Echo client program
 import socket
+import hashlib
 from time import gmtime, strftime
 from datetime import datetime
 import time
@@ -8,6 +8,14 @@ import json
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
+
+def hashData(unhashedData):
+    hash = hashlib.md5()
+    hash.update(unhashedData)
+    hashedData = hash.hexdigest()
+    finishedData = "<hash "+hashedData+">-"+unhashedData
+    print(finishedData)
+    return finishedData
 
 def main():
 
@@ -18,31 +26,19 @@ def main():
     lastPing = datetime.now()
 
 
-    # method tp save messages into the file .json
-    # def writeToJsonFile(path,fileName,dat):
-    #     filePath = './' + path + './' +fileName + '.json'
-    #     with open(filePath, 'w') as fp:
-    #         json.dump(dat , fp)
-    #
-    # path = './'
-    # fileName = 'example2'
-    # when we send data to the server, we are using a colon
-    # at the end of a sentence to mark the end of the current sentence
-    # later when the input comes back, we will then be breaking the input
-    # into individual parts using the colon : to separate the lines
     def readInputThreaded(so):
         global nickname
         print "Set your nickname"
         nick = raw_input()
         nickname = nick
-        so.sendall("<newclient "+nickname+">")
+        so.sendall(hashData("<newclient "+nickname+">"))
         print("[HELP] Typing <help> will give you a list of commands!")
 
         while 1:
             text = raw_input()
             if "<ping>" in text:
                 lastPing = datetime.now()
-                so.sendall(str(text))
+                so.sendall(hashData(str(text)))
             elif "<help>" in text:
                 print "<time>"
                 print "<date>"
@@ -59,7 +55,7 @@ def main():
                 command = splitMessage[0]
                 newnick = splitMessage[1]
                 nickname = newnick
-                so.sendall(str(text))
+                so.sendall(hashData(str(text)))
             elif "<close>" in text:
                 try:
                     so.close()
@@ -68,9 +64,9 @@ def main():
                     print "Error"
 
             elif "<" in text:
-                so.sendall(str(text))
+                so.sendall(hashData(str(text)))
             else:
-                so.sendall(str('<chat>'+nickname+'~'+text+'</chat>'))
+                so.sendall(hashData(str('<chat>'+nickname+'~'+text+'</chat>')))
 
             # writeToJsonFile(path,fileName,text)
 
@@ -113,15 +109,6 @@ def main():
                     break
                 except Exception:
                     print "Error"
-
-
-            #nickname = new
-                #print("Old nickname = " + nickname + " new nickname = " + NewNick)
-
-
-
-
-
 
     t = threading.Thread(target=readFromServer, args = (s,))
     t.start()
