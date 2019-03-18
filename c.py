@@ -36,9 +36,9 @@ def main():
         nick = raw_input()
         nickname = nick
         so.sendall("<newclient "+nickname+">")
+        print("[HELP] Typing <help> will give you a list of commands!")
 
         while 1:
-
             text = raw_input()
             if "<ping>" in text:
                 lastPing = datetime.now()
@@ -46,9 +46,12 @@ def main():
             elif "<help>" in text:
                 print "<time>"
                 print "<date>"
-                print "<getservertime>"
+                print "<servertime>"
                 print "<ping>"
                 print "<connected>"
+                print "<messages>"
+                print "<changenickname [NEW_NICKNAME]>"
+                print "<kick [USER]>"
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
@@ -56,6 +59,7 @@ def main():
                 command = splitMessage[0]
                 newnick = splitMessage[1]
                 nickname = newnick
+                so.sendall(str(text))
             elif "<close>" in text:
                 try:
                     so.close()
@@ -121,7 +125,6 @@ def main():
 
     t = threading.Thread(target=readFromServer, args = (s,))
     t.start()
-
 
 main()
 #s.close()
