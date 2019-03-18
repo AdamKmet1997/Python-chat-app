@@ -33,6 +33,12 @@ def getClientCon(name):
 def getClientName(con):
     clientName =  clients.keys()[clients.values().index(conn)]
     return clientName
+def getClientList():
+    population = len(clients)
+    message = str(population) + " clients connected. Clients: "
+    for client in clients.keys():
+        message = message + "\n" + client
+    return message
 
 
 
@@ -86,7 +92,6 @@ def parseInput(data, con):
         print(clients)
         #con.send('<changenickname '+newnick+'>')
     #:User Name-"Message">
-
     elif ":" in data:
         time = strftime("( %H:%M:%S) ", gmtime())
         Nmess= data.replace(':','')
@@ -98,7 +103,8 @@ def parseInput(data, con):
     elif "<ping>" in data:
         con.send("<pong>")
     elif "<showclients>" in data:
-        con.send(str(clients))
+        con.send(getClientList())
+        #con.send(str(clients))
     # writeToJsonFile(path,fileName,data)
     elif "<connected>" in data:
         print currentConnections

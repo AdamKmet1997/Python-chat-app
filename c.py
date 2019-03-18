@@ -109,7 +109,7 @@ def main():
                 print "<dates>"
                 print "<getservertime>"
                 print "<ping>"
-                print "<show>"
+                print "<showclients>"
             elif "<show>" in data:
                 print mylist
             elif "<close>" in data:
