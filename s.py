@@ -118,13 +118,11 @@ def parseInput(data, con):
         command = splitMessage[0]
         user = splitMessage[1]
         usercon = getClientCon(user)
-        usercon.send("<msg>[ANNOUNCEMENT] You have been kicked by "+kicker+".</msg>")
+        usercon.send("<info>[ANNOUNCEMENT] You have been kicked by "+kicker+".</info>")
         usercon.send('<close>')
         del clients[user]
         currentConnections.remove(usercon)
-        messageAll("<msg>[ANNOUNCEMENT] "+user+" has been kicked by "+kicker+".</msg>")
-    elif "<messages>" in data:
-        con.send("<info>Message count: "+str(getMessageCount())+"</info>")
+        messageAll("<info>Message count: "+str(getMessageCount())+"</info>")
 
 
 # we a new thread is started from an incoming connection
@@ -148,8 +146,6 @@ def manageConnection(conn, addr):
             data = conn.recv(1024)
             if data != "":
                 parseInput(data,conn)# Calling the parser
-
-
         except:
             print("Error, removing connection.")
             print(str(currentConnections))
