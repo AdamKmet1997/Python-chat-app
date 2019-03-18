@@ -43,6 +43,12 @@ def main():
             if "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(str(text))
+            elif "<help>" in text:
+                print "<time>"
+                print "<date>"
+                print "<getservertime>"
+                print "<ping>"
+                print "<connected>"
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
@@ -84,39 +90,17 @@ def main():
                 print ('[DATA]: ' +data)
             mylist.append(data)
 
-
             #:User Name-"Message">
             if '<msg>' in data:
                 message = data[5:-6]
                 print("[MSG] " + message)
-            if ":" in data:
-                time = strftime("( %H:%M:%S) ", gmtime())
-                Nmess= data.replace(':','')
-                Nmess= Nmess.split('-')
-                #global nickname
-                #nickname = Nmess[0]
-                #print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
-            elif "<getservertime>" in data:
-                print "command in data.."
-                formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-                print(str(formatted))
-            elif "<time>" in data:
-                print(str(data))
-            elif "<dates>" in data:
-                dates=strftime("%a, %d %b %Y", gmtime())
-                print(str(dates))
-            #elif "<leave>" in data:
-            #    s.close()
+            if '<info>' in data:
+                message = data[6:-7]
+                print("[INFO] " + message)
             elif "<pong>" in data:
                 end = datetime.now()
                 timeTaken = end - lastPing
                 print("Ping successfull. Time taken: " + str(timeTaken))
-            elif "<help>" in data:
-                print "<time>"
-                print "<dates>"
-                print "<getservertime>"
-                print "<ping>"
-                print "<showclients>"
             elif "<show>" in data:
                 print mylist
             elif "<close>" in data:

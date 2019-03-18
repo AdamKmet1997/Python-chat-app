@@ -16,6 +16,7 @@ clients = {
     #e.g:  'Daniel': connectionOBJECT
 }
 buffer = ""
+chatname = "Group chat"
 
 # This is the buffer string
 # when input comes in from a client it is added
@@ -44,8 +45,10 @@ def messageAll(message):
     for client in clients.values():
         print(client);
         client.send(message)
-
-
+def getMessageCount():
+    split = buffer.split(':')
+    messages = len(split)
+    return messages
 
 # # def writeToJsonFile(path,fileName,data):
 # #     with open('example2.json','w') as f:
@@ -67,19 +70,15 @@ def parseInput(data, con):
     if "<getservertime>" in data:
         print "command in data.."
         formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-        #con.send(str(formatted))
-        print " user requested server date and time "
-
+        con.send(str('<info>'+formatted+'</info>'))
     if "<time>" in data:
-        time = strftime(" %H %M %S +0000", gmtime())
-        t= str("time is" + time)
+        time = strftime("%H:%M:%S", gmtime())
+        t= str("Time: " + time)
         print t
-        con.send(t)
-        print " user requested time"
-    elif "<dates>" in data:
-        dates=strftime("%a, %d %b %Y", gmtime())
-    #    con.send(str(dates))
-        print " user requested date"
+        con.send('<info>'+t+'</info>')
+    elif "<date>" in data:
+        date=strftime("%a, %d %b %Y", gmtime())
+        con.send(str('<info>'+date+'</info>'))
     elif "<newclient " in data: #<newclient Daniel>
         tagless = data[1:-1]
         splitMessage = tagless.split(' ')
@@ -110,13 +109,22 @@ def parseInput(data, con):
     #    print("user has left the chat")
     elif "<ping>" in data:
         con.send("<pong>")
-    elif "<showclients>" in data:
-        con.send(getClientList())
-        #con.send(str(clients))
-    # writeToJsonFile(path,fileName,data)
     elif "<connected>" in data:
-        print currentConnections
-
+        con.send('<info>'+getClientList()+'</info>')
+    elif "<kick " in data:
+        kicker = getClientName(con)
+        tagless = data[1:-1]
+        splitMessage = tagless.split(' ')
+        command = splitMessage[0]
+        user = splitMessage[1]
+        usercon = getClientCon(user)
+        usercon.send("<msg>[ANNOUNCEMENT] You have been kicked by "+kicker+".</msg>")
+        usercon.send('<close>')
+        del clients[user]
+        currentConnections.remove(usercon)
+        messageAll("<msg>[ANNOUNCEMENT] "+user+" has been kicked by "+kicker+".</msg>")
+    elif "<messages>" in data:
+        con.send("<info>Message count: "+str(getMessageCount())+"</info>")
 
 
 # we a new thread is started from an incoming connection
@@ -136,15 +144,21 @@ def manageConnection(conn, addr):
 
 
     while 1:
-        data = conn.recv(1024)
-        if data != "":
-            parseInput(data,conn)# Calling the parser
+        try:
+            data = conn.recv(1024)
+            if data != "":
+                parseInput(data,conn)# Calling the parser
 
 
+        except:
+            print("Error, removing connection.")
+            print(str(currentConnections))
+
+            for singleClient in currentConnections:
+                singleClient.send(str(data))
     #    print "rec:" + str(data)
 
-        for singleClient in currentConnections:
-            singleClient.send(str(data))
+
         #store messages in a list called mylist
         mylist.append(data)
         print mylist
