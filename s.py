@@ -15,18 +15,19 @@ currentConnections = list()
 clients = {
     #e.g:  'Daniel': connectionOBJECT
 }
-
+buffer = ""
 
 # This is the buffer string
 # when input comes in from a client it is added
 # into the buffer string to be relayed later
 # to different clients that have connected
 # Each message in the buffer is separated by a colon :
-buffer = ""
+
 
 # custom say hello command
-def sayHello():
-    print "----> The hello function was called"
+def getTimestamp():
+    time = strftime("[%H:%M:%S]", gmtime())
+    return time
 def getClientCon(name):
     clientCon = clients[name]
     return clientCon
@@ -39,6 +40,10 @@ def getClientList():
     for client in clients.keys():
         message = message + "\n" + client
     return message
+def messageAll(message):
+    for client in clients.values():
+        print(client);
+        client.send(message)
 
 
 
@@ -52,6 +57,7 @@ def getClientList():
 # data and search to see if a command is present in the text. If it finds a
 # command it will then need to extract the command.
 def parseInput(data, con):
+    global buffer
     print "parsing..."
 
 
@@ -80,8 +86,7 @@ def parseInput(data, con):
         command = splitMessage[0]
         newclient = splitMessage[1]
         clients[newclient] = con
-        print(clients)
-        print("Get client name:" + getClientName(con))
+        messageAll("<msg>[ANNOUNCEMENT] New client "+newclient+" connected.</msg>")
     elif "<changenickname " in data: #<changenick Daniel>
         tagless = data[1:-1]
         splitMessage = tagless.split(' ')
@@ -92,12 +97,15 @@ def parseInput(data, con):
         print(clients)
         #con.send('<changenickname '+newnick+'>')
     #:User Name-"Message">
-    elif ":" in data:
-        time = strftime("( %H:%M:%S) ", gmtime())
-        Nmess= data.replace(':','')
-        Nmess= Nmess.split('-')
-        nickname = Nmess[0]
-        print(""+ str(time)+"" + nickname + "-> " + Nmess[1])
+    elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
+        timestamp = getTimestamp()
+        tagless = data[6:-7]
+        buffer = buffer + tagless + ":"
+        splitMessage = tagless.split('~')
+        user = splitMessage[0]
+        message = splitMessage[1]
+        messageAll("<msg>"+timestamp+" "+user+": " + message+"</msg>")
+
     #elif "<leave>" in data:
     #    print("user has left the chat")
     elif "<ping>" in data:

@@ -60,7 +60,7 @@ def main():
             elif "<" in text:
                 so.sendall(str(text))
             else:
-                so.sendall(str(":"+nickname+"-"+text))
+                so.sendall(str('<chat>'+nickname+'~'+text+'</chat>'))
 
             # writeToJsonFile(path,fileName,text)
 
@@ -75,13 +75,20 @@ def main():
     '''
     def readFromServer(s):
         global nickname
+        debug = 0  #Set to 1 to see [data] messages from the server.
         mylist
 
         while 1:
             data = s.recv(100)
-            print ('[DATA]: ' +data)
+            if debug == 1:
+                print ('[DATA]: ' +data)
             mylist.append(data)
+
+
             #:User Name-"Message">
+            if '<msg>' in data:
+                message = data[5:-6]
+                print("[MSG] " + message)
             if ":" in data:
                 time = strftime("( %H:%M:%S) ", gmtime())
                 Nmess= data.replace(':','')
