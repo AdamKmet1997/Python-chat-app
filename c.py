@@ -14,7 +14,6 @@ def hashData(unhashedData):
     hash.update(unhashedData)
     hashedData = hash.hexdigest()
     finishedData = "<hash "+hashedData+">-"+unhashedData
-    print(finishedData)
     return finishedData
 
 def main():
@@ -48,6 +47,8 @@ def main():
                 print "<messages>"
                 print "<changenickname [NEW_NICKNAME]>"
                 print "<kick [USER]>"
+                print "<roomname>"
+                print "<changeroomname [NEW_ROOMNAME]>"
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
@@ -81,13 +82,13 @@ def main():
     '''
     def readFromServer(s):
         global nickname
-        debug = 0  #Set to 1 to see [data] messages from the server.
+        debug = 1  #Set to 1 to see [data] messages from the server.
         mylist
 
         while 1:
             data = s.recv(100)
             if debug == 1:
-                print ('[DATA]: ' +data)
+                print ('[DEBUG]: ' +data)
             mylist.append(data)
 
             #:User Name-"Message">
