@@ -65,16 +65,19 @@ def main():
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
             elif "<help>" in text:
-                print "<time>"
-                print "<date>"
-                print "<servertime>"
-                print "<ping>"
-                print "<connected>"
-                print "<messages>"
-                print "<changenickname [NEW_NICKNAME]>"
-                print "<kick [USER]>"
-                print "<roomname>"
-                print "<changeroomname [NEW_ROOMNAME]>"
+                print "---------------------------------------------------------"
+                print "|The following commands can be used in this application.|"
+                print "---------------------------------------------------------"
+                print "<time>\t\t\t\t\t   <--Prints the local time in format H:M:S-->"
+                print "<date>\t\t\t\t\t   <--Prints the local date time in format DDD, D:MMM:YYYY-->"
+                print "<servertime>\t\t\t\t   <--Gets a precise server time and date-->"
+                print "<ping>\t\t\t\t\t   <--Checks server connectivity and round trip timing-->"
+                print "<connected>\t\t\t\t   <--Shows number of connected clients and client list-->"
+                print "<messages>\t\t\t\t   <--Shows message count-->"
+                print "<changenickname [NEW_NICKNAME]>\t\t   <--Change your nickname-->"
+                print "<kick [USER]>\t\t\t\t   <--Kick a user-->"
+                print "<roomname>\t\t\t\t   <--Show roomname-->"
+                print "<changeroomname [NEW_ROOMNAME]>\t\t   <--Edit roomname-->"
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]

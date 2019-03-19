@@ -148,7 +148,7 @@ def parseInput(data, con):
             del clients[user]
             currentConnections.remove(usercon)
         elif "<messages>" in data:
-            messageAll(hashData(messageInfo("Message count: "+str(getMessageCount()))))
+            con.send(hashData(messageInfo("Message count: "+str(getMessageCount()))))
         elif "<roomname>" in data:
             con.send(hashData(messageInfo("You are currently connected to \'"+getChatName()+"\'.")))
         elif "<changeroomname " in data:
