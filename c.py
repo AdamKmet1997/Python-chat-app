@@ -25,6 +25,9 @@ def verifyHash(data):
     hash = hashlib.md5()
     hash.update(secondHash)
     secondHash = hash.hexdigest()
+    if debug == 1:
+        print("First hash:"+firstHash)
+        print("Second hash: "+secondHash)
     if firstHash == secondHash:
         return 1
     else:

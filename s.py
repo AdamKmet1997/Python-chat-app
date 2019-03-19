@@ -112,7 +112,7 @@ def parseInput(data, con):
             command = splitMessage[0]
             newclient = splitMessage[1]
             clients[newclient] = con
-            messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected.")))
+            messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+chatname+"\'.")))
         elif "<changenickname " in data: #<changenick Daniel>
             oldnick = getClientName(con)
             tagless = data[1:-1]
