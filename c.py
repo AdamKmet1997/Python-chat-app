@@ -8,6 +8,7 @@ import json
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
+debug = 1
 
 def hashData(unhashedData):
     hash = hashlib.md5()
@@ -15,9 +16,26 @@ def hashData(unhashedData):
     hashedData = hash.hexdigest()
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
+def verifyHash(data):
+    split = data.split('-')
+    firstHash = split[0]
+    secondHash = split[1]
+    firstHash = firstHash[6:-1]
+
+    hash = hashlib.md5()
+    hash.update(secondHash)
+    secondHash = hash.hexdigest()
+    if firstHash == secondHash:
+        return 1
+    else:
+        return 0
+def stripHash(data):
+    data = data.split('-', 1)
+    stripped = data[1]
+    return stripped
 
 def main():
-
+    global debug
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     mylist = list()
@@ -82,7 +100,7 @@ def main():
     '''
     def readFromServer(s):
         global nickname
-        debug = 1  #Set to 1 to see [data] messages from the server.
+        global debug  #Set to 1 to see [data] messages from the server.
         mylist
 
         while 1:
@@ -90,27 +108,29 @@ def main():
             if debug == 1:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
+            if verifyHash(data) == 1:
+                data = stripHash(data)
 
-            #:User Name-"Message">
-            if '<msg>' in data:
-                message = data[5:-6]
-                print("[MSG] " + message)
-            if '<info>' in data:
-                message = data[6:-7]
-                print("[INFO] " + message)
-            elif "<pong>" in data:
-                end = datetime.now()
-                timeTaken = end - lastPing
-                print("Ping successfull. Time taken: " + str(timeTaken))
-            elif "<show>" in data:
-                print mylist
-            elif "<close>" in data:
-                try:
-                    s.close()
-                    break
-                except Exception:
-                    print "Error"
-
+                if '<msg>' in data:
+                    message = data[5:-6]
+                    print("[MSG] " + message)
+                if '<info>' in data:
+                    message = data[6:-7]
+                    print("[INFO] " + message)
+                elif "<pong>" in data:
+                    end = datetime.now()
+                    timeTaken = end - lastPing
+                    print("Ping successfull. Time taken: " + str(timeTaken))
+                elif "<show>" in data:
+                    print mylist
+                elif "<close>" in data:
+                    try:
+                        s.close()
+                        break
+                    except Exception:
+                        print "Error"
+            else:
+                print("HASHES DO NOT MATCH")
     t = threading.Thread(target=readFromServer, args = (s,))
     t.start()
 
