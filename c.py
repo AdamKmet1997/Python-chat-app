@@ -107,8 +107,8 @@ def main():
         mylist
 
         while 1:
-            data = s.recv(100)
-            if debug == 1:
+            data = s.recv(4096)
+            if debug == 0:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
             if verifyHash(data) == 1:

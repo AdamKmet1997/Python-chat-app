@@ -112,7 +112,7 @@ def parseInput(data, con):
             command = splitMessage[0]
             newclient = splitMessage[1]
             clients[newclient] = con
-            messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+chatname+"\'.")))
+            messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
         elif "<changenickname " in data: #<changenick Daniel>
             oldnick = getClientName(con)
             tagless = data[1:-1]
@@ -173,7 +173,7 @@ def manageConnection(conn, addr):
 
     while 1:
         try:
-            data = conn.recv(1024)
+            data = conn.recv(4096)
             if data != "":
                 parseInput(data,conn)# Calling the parser
         except socket.error as error:
