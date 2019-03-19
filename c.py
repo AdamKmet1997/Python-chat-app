@@ -8,7 +8,7 @@ import json
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
-debug = 1
+debug = 0
 
 def hashData(unhashedData):
     hash = hashlib.md5()
@@ -17,7 +17,10 @@ def hashData(unhashedData):
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
 def verifyHash(data):
+    global debug
     split = data.split('-')
+    if debug == 1:
+        print("[DEBUG] Data with hash: " + str(split))
     firstHash = split[0]
     secondHash = split[1]
     firstHash = firstHash[6:-1]
@@ -32,6 +35,7 @@ def verifyHash(data):
         return 1
     else:
         return 0
+
 def stripHash(data):
     data = data.split('-', 1)
     stripped = data[1]
@@ -45,7 +49,8 @@ def main():
     nickname = 'NO_NICKNAME'
     lastPing = datetime.now()
 
-
+    if debug == 1:
+        print('[DEBUG] !!!DEBUG MODE ENABLED. SET DEBUG VALUE TO 0 TO DISABLE!!!')
     def readInputThreaded(so):
         global nickname
         print "Set your nickname"
@@ -108,7 +113,7 @@ def main():
 
         while 1:
             data = s.recv(4096)
-            if debug == 0:
+            if debug == 1:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
             if verifyHash(data) == 1:
@@ -123,7 +128,7 @@ def main():
                 elif "<pong>" in data:
                     end = datetime.now()
                     timeTaken = end - lastPing
-                    print("Ping successfull. Time taken: " + str(timeTaken))
+                    print("[INFO] Ping successful. Time taken: " + str(timeTaken))
                 elif "<show>" in data:
                     print mylist
                 elif "<close>" in data:

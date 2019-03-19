@@ -132,7 +132,7 @@ def parseInput(data, con):
             print("Message received")
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
-            con.send("<pong>")
+            con.send(hashData("<pong>"))
         elif "<connected>" in data:
             con.send(hashData(messageInfo(getClientList())))
         elif "<kick " in data:
@@ -155,7 +155,8 @@ def parseInput(data, con):
             oldname = getChatName()
             user = getClientName(con)
             newname = data[16:-1]
-            messageAll(hashData(messageInfo("The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
+            setChatName(newname)
+            messageAll(hashData(messageInfo("[ANNOUNCEMENT] The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
     else:
         print("Hashes do not match!")
 # we a new thread is started from an incoming connection
