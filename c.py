@@ -27,8 +27,8 @@ def verifyHash(data):
     hash.update(secondHash)
     secondHash = hash.hexdigest()
     if debug == 1:
-        print("First hash:"+firstHash)
-        print("Second hash: "+secondHash)
+        print("[DEBUG] First hash:"+firstHash)
+        print("[DEBUG] Second hash: "+secondHash)
     if firstHash == secondHash:
         return 1
     else:
@@ -40,6 +40,7 @@ def stripHash(data):
 
 def main():
     global debug
+    global nickname
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     mylist = list()
@@ -49,16 +50,36 @@ def main():
 
     def readInputThreaded(so):
         global nickname
-        print "Set your nickname"
-        nick = raw_input()
-        nickname = nick
-        so.sendall(hashData("<newclient "+nickname+">"))
-        print("[HELP] Typing <help> will give you a list of commands!")
+        while nickname == 'NO_NICKNAME' or len(nickname) < 1 :
+            print "Set your nickname:"
+            nick = raw_input()
+            nickname = nick
+            if len(nickname) > 0:
+                so.sendall(hashData("<newclient "+nickname+">"))
+            print("[HELP] Typing <help> will give you a list of commands!")
 
         while 1:
             text = raw_input()
-            
-            if "<ping>" in text:
+            if text == "":
+                print("[INFO] No message entered.")
+            if "<change_color>" in text:
+                colourcodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f']
+                colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
+                def color(i):
+                	i = i.lower()
+                	return colourcodes[colournames.index(i)]
+
+                textcolor = raw_input('\nWhat colour do you want the text?  ')
+                Backcolor = raw_input('\nWhat colour do you want the background?  ')
+                a = color(Backcolor)
+                b = color(textcolor)
+                c = 'color %s%s' % (a, b)
+                os.system(c)
+            if "<color_help>" in text:
+                colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
+                colourprint = ', '.join([c.title() for c in colournames])
+                print "Colors available are " +colourprint
+            elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
             elif "<help>" in text:

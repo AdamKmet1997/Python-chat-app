@@ -18,7 +18,7 @@ clients = {
 }
 buffer = ""
 chatname = "Year 3 Group chat"
-debug = 1
+debug = 0
 # This is the buffer string
 # when input comes in from a client it is added
 # into the buffer string to be relayed later
@@ -157,7 +157,8 @@ def parseInput(data, con):
             newname = data[16:-1]
             messageAll(hashData(messageInfo("The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
     else:
-        print("Hashes do not match!")
+        if debug == 1:
+            print("[DEBUG] Hashes do not match!")
 # we a new thread is started from an incoming connection
 # the manageConnection funnction is used to take the input
 # and print it out on the server
@@ -173,17 +174,22 @@ def manageConnection(conn, addr):
 
     while 1:
         try:
+
             data = conn.recv(4096)
             if data != "":
                 parseInput(data,conn)# Calling the parser
-        except socket.error as error:
-            print("Error, removing connection.")
-            print(str(currentConnections))
+
 
             for singleClient in currentConnections:
                 singleClient.send(str(data))
-    #    print "rec:" + str(data)
-        #store messages in a list called mylist
+
+
+        except socket.error as error:
+            print(error)
+            print("Error, removing connection.")
+            print(str(currentConnections))
+            t._Thread_stop()
+            break
         mylist.append(data)
         print mylist
 
