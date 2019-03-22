@@ -19,7 +19,6 @@ clients = {
 }
 buffer = ""
 chatname = "Year 3 Group chat"
-f= open("chatlog.txt","w+")
 debug = 0
 # This is the buffer string
 # when input comes in from a client it is added
