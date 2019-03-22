@@ -61,7 +61,9 @@ def main():
 
         while 1:
             text = raw_input()
-            if "<ping>" in text:
+            if "" in text:
+                print("[INFO] No message entered.")
+            elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
             elif "<help>" in text:
