@@ -4,12 +4,11 @@ import hashlib
 from time import gmtime, strftime
 from datetime import datetime
 import time
-import os
 import json
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
-debug = 1
+debug = 0
 
 def hashData(unhashedData):
     hash = hashlib.md5()
@@ -18,7 +17,10 @@ def hashData(unhashedData):
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
 def verifyHash(data):
+    global debug
     split = data.split('-')
+    if debug == 1:
+        print("[DEBUG] Data with hash: " + str(split))
     firstHash = split[0]
     secondHash = split[1]
     firstHash = firstHash[6:-1]
@@ -33,6 +35,7 @@ def verifyHash(data):
         return 1
     else:
         return 0
+
 def stripHash(data):
     data = data.split('-', 1)
     stripped = data[1]
@@ -47,7 +50,8 @@ def main():
     nickname = 'NO_NICKNAME'
     lastPing = datetime.now()
 
-
+    if debug == 1:
+        print('[DEBUG] !!!DEBUG MODE ENABLED. SET DEBUG VALUE TO 0 TO DISABLE!!!')
     def readInputThreaded(so):
         global nickname
         while nickname == 'NO_NICKNAME' or len(nickname) < 1 :
@@ -83,16 +87,19 @@ def main():
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
             elif "<help>" in text:
-                print "<time>"
-                print "<date>"
-                print "<servertime>"
-                print "<ping>"
-                print "<connected>"
-                print "<messages>"
-                print "<changenickname [NEW_NICKNAME]>"
-                print "<kick [USER]>"
-                print "<roomname>"
-                print "<changeroomname [NEW_ROOMNAME]>"
+                print "---------------------------------------------------------"
+                print "|The following commands can be used in this application.|"
+                print "---------------------------------------------------------"
+                print "<time>\t\t\t\t\t   <--Prints the local time in format H:M:S-->"
+                print "<date>\t\t\t\t\t   <--Prints the local date time in format DDD, D:MMM:YYYY-->"
+                print "<servertime>\t\t\t\t   <--Gets a precise server time and date-->"
+                print "<ping>\t\t\t\t\t   <--Checks server connectivity and round trip timing-->"
+                print "<connected>\t\t\t\t   <--Shows number of connected clients and client list-->"
+                print "<messages>\t\t\t\t   <--Shows message count-->"
+                print "<changenickname [NEW_NICKNAME]>\t\t   <--Change your nickname-->"
+                print "<kick [USER]>\t\t\t\t   <--Kick a user-->"
+                print "<roomname>\t\t\t\t   <--Show roomname-->"
+                print "<changeroomname [NEW_ROOMNAME]>\t\t   <--Edit roomname-->"
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
@@ -131,7 +138,7 @@ def main():
 
         while 1:
             data = s.recv(4096)
-            if debug == 0:
+            if debug == 1:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
             if verifyHash(data) == 1:
@@ -146,7 +153,7 @@ def main():
                 elif "<pong>" in data:
                     end = datetime.now()
                     timeTaken = end - lastPing
-                    print("Ping successfull. Time taken: " + str(timeTaken))
+                    print("[INFO] Ping successful. Time taken: " + str(timeTaken))
                 elif "<show>" in data:
                     print mylist
                 elif "<close>" in data:
