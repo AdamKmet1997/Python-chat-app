@@ -54,11 +54,12 @@ def main():
         print('[DEBUG] !!!DEBUG MODE ENABLED. SET DEBUG VALUE TO 0 TO DISABLE!!!')
     def readInputThreaded(so):
         global nickname
-        while nickname == 'NO_NICKNAME':
+        while nickname == 'NO_NICKNAME' or len(nickname) < 1 :
             print "Set your nickname:"
             nick = raw_input()
             nickname = nick
-            so.sendall(hashData("<newclient "+nickname+">"))
+            if len(nickname) > 0:
+                so.sendall(hashData("<newclient "+nickname+">"))
             print("[HELP] Typing <help> will give you a list of commands!")
 
         while 1:
