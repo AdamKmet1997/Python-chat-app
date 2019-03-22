@@ -145,17 +145,15 @@ def parseInput(data, con): #Handles all messages coming in from the clients
         elif "<date>" in data: #Returns current weekday, and date in D:M:Y
             date=strftime("%a, %d %b %Y", gmtime())
             con.send(hashData(messageInfo(str(date))))
-
-        elif "<show>" in data: #Displays previous messages to the client
+        elif "<show>" in data:
+            first_msg = buffer.split(":")
+            show = "\n".join(str(x) for x in first_msg)
             count = buffer.count(":")
             count = str(count)
-            first_msg = buffer.split(":")
-            show = " - ".join(str(x) for x in first_msg)
-            show = "there are "+ count +" previous messages " + show
+            show = "there are "+ count +" previous messages \n" + show
             print show
-            con.send(hashData(show))
-
-        elif "<newclient " in data: #Lets a new connecting client to be added to the chat
+            con.send(hashData(messageInfo(show)))
+        elif "<newclient " in data: #<newclient Daniel>
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
             command = splitMessage[0]
