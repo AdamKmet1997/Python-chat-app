@@ -87,8 +87,6 @@ def main():
             elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
-            elif "<show>" in text:
-                so.sendall(hashData(str(text)))
             elif "<help>" in text:
                 print "---------------------------------------------------------"
                 print "|The following commands can be used in this application.|"
@@ -106,7 +104,6 @@ def main():
                 print "<kick [USER]>\t\t\t\t   <--Kick a user-->"
                 print "<roomname>\t\t\t\t   <--Show roomname-->"
                 print "<changeroomname [NEW_ROOMNAME]>\t\t   <--Edit roomname-->"
-
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
@@ -121,7 +118,6 @@ def main():
                     break
                 except Exception:
                     print "Error"
-
             elif "<" in text:
                 so.sendall(hashData(str(text)))
             else:
@@ -160,8 +156,6 @@ def main():
                     end = datetime.now()
                     timeTaken = end - lastPing
                     print("[INFO] Ping successful. Time taken: " + str(timeTaken))
-                elif "<show>" in data:
-                    print mylist
                 elif "<close>" in data:
                     try:
                         s.close()

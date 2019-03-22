@@ -114,7 +114,7 @@ def parseInput(data, con):
         if "<servertime>" in data:
             formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
             con.send(hashData(messageInfo(str(formatted))))
-        if "<time>" in data:
+        elif "<time>" in data:
             time = strftime("%H:%M:%S", gmtime())
             timeString = str("Time: " + time)
             con.send(hashData(messageInfo(timeString)))
@@ -124,8 +124,6 @@ def parseInput(data, con):
         elif "<show>" in data:
             first_msg = buffer.split(":")
             show = "\n".join(str(x) for x in first_msg)
-            print buffer
-            print show
             con.send(hashData(messageInfo(show)))
         elif "<newclient " in data: #<newclient Daniel>
             tagless = data[1:-1]
