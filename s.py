@@ -32,8 +32,9 @@ usernameTaken = 0
 
 # custom say hello command
 def log(message):
+    timestamp = str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))
     f = open("Logs/chat_log_"+ dateString +".txt","a+")
-    f.write(message)
+    f.write(timestamp+" "+message+"\n")
     f.close()
 def getTimestamp():
     time = strftime("[%H:%M:%S]", gmtime())
@@ -99,7 +100,8 @@ timestamp = getTimestamp()
 date = strftime("%a_%d_%b_%Y", gmtime())
 dateString = str(date)
 print("Server started.")
-log("Server started at " + timestamp +"\n")
+log("\n\n-----------------------------------------"+"Server started at "+str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))
++"-----------------------------------------")
 
 def parseInput(data, con):
     global buffer
@@ -134,11 +136,8 @@ def parseInput(data, con):
                     con.send(hashData('<close>'))
             if usernameTaken == 0:
                 clients[newclient] = con
-                timestamp = getTimestamp()
-                date = strftime("%a_%d_%b_%Y", gmtime())
-                dateString = str(date)
                 messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
-                log("New client "+newclient+" at "+ getTimestamp() +"\n")
+                log("New client \'"+newclient+"\' connected")
 
         elif "<changenickname " in data: #<changenick Daniel>
             oldnick = getClientName(con)
@@ -148,12 +147,8 @@ def parseInput(data, con):
             newnick = splitMessage[1]
             del clients[getClientName(con)] #Removes client value
             clients[newnick] = con # Adds a client value based on new nickname
-            timestamp = getTimestamp()
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log("Nickname changed to " + newnick + " By "+ oldnick +" at "+ timestamp +"\n")
-
-            messageAll(hashData(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'." )))
+            log("Nickname changed to " + newnick + " By "+ oldnick)
+            messageAll(hashData(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'" )))
         elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
             timestamp = getTimestamp()
             tagless = data[6:-7]
@@ -162,23 +157,14 @@ def parseInput(data, con):
             user = splitMessage[0]
             message = splitMessage[1]
             print("Message received")
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log("Message : "+timestamp+" "+user+": " + message + "\n")
+            log("Message : "+user+": " + message)
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
-            timestamp = getTimestamp()
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log("Server pinged at " + timestamp +"\n")
-
             con.send(hashData("<pong>"))
+            log("Server pinged by " + getClientName(con))
         elif "<connected>" in data:
-            timestamp = getTimestamp()
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log("Connection list called at " + timestamp +" List Value "+ getClientList() +"\n")
             con.send(hashData(messageInfo(getClientList())))
+            log("Connection list called. "+ getClientList())
         elif "<kick " in data:
             kicker = getClientName(con)
             tagless = data[1:-1]
@@ -188,13 +174,11 @@ def parseInput(data, con):
             usercon = getClientCon(user)
             usercon.send(hashData(messageInfo("[ANNOUNCEMENT] You have been kicked by "+kicker+".")))
             usercon.send('<close>')
-            timestamp = getTimestamp()
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log(user + " Kicked from Chat at " + timestamp + " by "+ kicker +"\n")
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'.")))
             del clients[user]
             currentConnections.remove(usercon)
+            log(user + " has been kicked from the chat by "+ kicker)
+
         elif "<messages>" in data:
             con.send(hashData(messageInfo("Message count: "+str(getMessageCount()))))
         elif "<roomname>" in data:
@@ -204,11 +188,9 @@ def parseInput(data, con):
             user = getClientName(con)
             newname = data[16:-1]
             setChatName(newname)
-            timestamp = getTimestamp()
-            date = strftime("%a_%d_%b_%Y", gmtime())
-            dateString = str(date)
-            log("Chat Room name changed to " + newname + " at "+ timestamp +"\n")
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
+            log("Chat room name changed from " + oldname + " to "+newname+" by "+user)
+
     else:
         if debug == 1:
             print("[DEBUG] Hashes do not match!")
