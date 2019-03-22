@@ -83,7 +83,7 @@ def main():
             if "<colorhelp>" in text:
                 colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
                 colourprint = ', '.join([c.title() for c in colournames])
-                print "Colors available are: " +colourprint
+                print "[INFO] Colors available are: " +colourprint
             elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))

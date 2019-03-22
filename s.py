@@ -160,7 +160,7 @@ def parseInput(data, con):
             user = splitMessage[0]
             message = splitMessage[1]
             print("Message received")
-            log("Message : "+user+": " + message)
+            log("[MSG]: "+user+": " + message)
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
             con.send(hashData("<pong>"))
