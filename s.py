@@ -162,7 +162,6 @@ def parseInput(data, con):
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
             log("Message : "+timestamp+" "+user+": " + message + "\n")
-
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
             timestamp = getTimestamp()
@@ -176,7 +175,6 @@ def parseInput(data, con):
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
             log("Connection list called at " + timestamp +" List Value "+ getClientList() +"\n")
-
             con.send(hashData(messageInfo(getClientList())))
         elif "<kick " in data:
             kicker = getClientName(con)
@@ -191,7 +189,6 @@ def parseInput(data, con):
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
             log(user + " Kicked from Chat at " + timestamp + " by "+ kicker +"\n")
-
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'.")))
             del clients[user]
             currentConnections.remove(usercon)
@@ -208,7 +205,6 @@ def parseInput(data, con):
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
             log("Chat Room name changed to " + newname + " at "+ timestamp +"\n")
-
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
     else:
         if debug == 1:
