@@ -132,7 +132,7 @@ def parseInput(data, con):
             print("Message received")
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
-            con.send(hashData("<pong>"))
+            con.send("<pong>")
         elif "<connected>" in data:
             con.send(hashData(messageInfo(getClientList())))
         elif "<kick " in data:
@@ -148,15 +148,14 @@ def parseInput(data, con):
             del clients[user]
             currentConnections.remove(usercon)
         elif "<messages>" in data:
-            con.send(hashData(messageInfo("Message count: "+str(getMessageCount()))))
+            messageAll(hashData(messageInfo("Message count: "+str(getMessageCount()))))
         elif "<roomname>" in data:
             con.send(hashData(messageInfo("You are currently connected to \'"+getChatName()+"\'.")))
         elif "<changeroomname " in data:
             oldname = getChatName()
             user = getClientName(con)
             newname = data[16:-1]
-            setChatName(newname)
-            messageAll(hashData(messageInfo("[ANNOUNCEMENT] The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
+            messageAll(hashData(messageInfo("The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
     else:
         print("Hashes do not match!")
 # we a new thread is started from an incoming connection
@@ -187,7 +186,6 @@ def manageConnection(conn, addr):
         #store messages in a list called mylist
         mylist.append(data)
         print mylist
-
 
 
 while 1:
