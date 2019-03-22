@@ -31,6 +31,10 @@ usernameTaken = 0
 
 
 # custom say hello command
+def log(message):
+    f = open("Logs/chat_log_"+ dateString +".txt","a+")
+    f.write(message)
+    f.close()
 def getTimestamp():
     time = strftime("[%H:%M:%S]", gmtime())
     return time
@@ -95,9 +99,7 @@ timestamp = getTimestamp()
 date = strftime("%a_%d_%b_%Y", gmtime())
 dateString = str(date)
 print("Server started.")
-f= open("Logs/chat_log_"+ dateString +".txt","a+")
-f.write("Server started at " + timestamp +"\n")
-f.close()
+log("Server started at " + timestamp +"\n")
 
 def parseInput(data, con):
     global buffer
@@ -133,9 +135,8 @@ def parseInput(data, con):
             if usernameTaken == 0:
                 clients[newclient] = con
                 messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
-                f= open("Logs/chat_log_"+ dateString +".txt","a+")
-                f.write("New client "+newclient+" at "+ timestamp +"\n")
-                f.close()
+                log("New client "+newclient+" at "+ getTimestamp() +"\n")
+
         elif "<changenickname " in data: #<changenick Daniel>
             oldnick = getClientName(con)
             tagless = data[1:-1]
@@ -147,9 +148,8 @@ def parseInput(data, con):
             timestamp = getTimestamp()
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write("Nickname changed to " + newnick + " By "+ oldnick +" at "+ timestamp +"\n")
-            f.close()
+            log("Nickname changed to " + newnick + " By "+ oldnick +" at "+ timestamp +"\n")
+
             messageAll(hashData(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'." )))
         elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
             timestamp = getTimestamp()
@@ -161,25 +161,22 @@ def parseInput(data, con):
             print("Message received")
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write("Message : "+timestamp+" "+user+": " + message + "\n")
-            f.close()
+            log("Message : "+timestamp+" "+user+": " + message + "\n")
+
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
         elif "<ping>" in data:
             timestamp = getTimestamp()
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write("Server pinged at " + timestamp +"\n")
-            f.close()
+            log("Server pinged at " + timestamp +"\n")
+
             con.send(hashData("<pong>"))
         elif "<connected>" in data:
             timestamp = getTimestamp()
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write("Connection list called at " + timestamp +" List Value "+ getClientList() +"\n")
-            f.close()
+            log("Connection list called at " + timestamp +" List Value "+ getClientList() +"\n")
+
             con.send(hashData(messageInfo(getClientList())))
         elif "<kick " in data:
             kicker = getClientName(con)
@@ -193,9 +190,8 @@ def parseInput(data, con):
             timestamp = getTimestamp()
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write(user + " Kicked from Chat at " + timestamp + " by "+ kicker +"\n")
-            f.close()
+            log(user + " Kicked from Chat at " + timestamp + " by "+ kicker +"\n")
+
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'.")))
             del clients[user]
             currentConnections.remove(usercon)
@@ -211,9 +207,8 @@ def parseInput(data, con):
             timestamp = getTimestamp()
             date = strftime("%a_%d_%b_%Y", gmtime())
             dateString = str(date)
-            f= open("Logs/chat_log_"+ dateString +".txt","a+")
-            f.write("Chat Room name changed to " + newname + " at "+ timestamp +"\n")
-            f.close()
+            log("Chat Room name changed to " + newname + " at "+ timestamp +"\n")
+
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] The room name has been changed from \'"+oldname+"\' to \'"+newname+"\' by "+user+".")))
     else:
         if debug == 1:
