@@ -8,74 +8,80 @@ import os
 import json
 
 
+# -------------------- INITIAL SOCKET SETUP  -------------------- #
+
 
 HOST = '127.0.0.1'
 PORT = 50007
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
+
+
+# -------------------- DECLARATIONS  -------------------- #
+
+
 mylist = list()
-currentConnections = list()
-clients = {
+currentConnections = list() #Contains our currently connected connection references
+clients = { # Stores a dictionary of users/connections
     #e.g:  'Daniel': connectionOBJECT
 }
-buffer = ""
+buffer = "" #Messages coming in from clients will be stored here before being forwarded to other clients
 chatname = "Year 3 Group chat"
-debug = 0
 newclient = ""
 usernameTaken = 0
-# This is the buffer string
-# when input comes in from a client it is added
-# into the buffer string to be relayed later
-# to different clients that have connected
-# Each message in the buffer is separated by a colon :
+
+debug = 0  #Set to 1 to enable debug mode or 0 to disable
 
 
-# custom say hello command
-def log(message):
+# -------------------- FUNCTIONS  -------------------- #
+
+
+
+def log(message): #Takes in a message and logs it to a log file titled after todays date.
     timestamp = str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))
     f = open("Logs/chat_log_"+ dateString +".txt","a+")
     f.write(timestamp+" "+message+"\n")
     f.close()
-def getTimestamp():
+def getTimestamp(): #Returns current timestamp
     time = strftime("[%H:%M:%S]", gmtime())
     return time
-def getChatName():
+def getChatName(): #Returns name of chatroom
     return chatname
-def setChatName(newName):
+def setChatName(newName): #Sets name of chatroom
     global chatname
     chatname = newName
-def getClientCon(name):
+def getClientCon(name): #Returns a client connection reference from a client nickname
     clientCon = clients[name]
     return clientCon
-def getClientName(con):
+def getClientName(con):#Returns a client name from a client connection reference
     clientName =  clients.keys()[clients.values().index(conn)]
     return clientName
-def getClientList():
+def getClientList(): #Returns amount of clients connected and lists them
     population = len(clients)
     message = str(population) + " clients connected. Clients: "
     for client in clients.keys():
         message = message + "\n" + client
     return message
-def messageAll(message):
+def messageAll(message): #Forwards a message to all users.
     for client in clients.values():
         client.send(message)
-def getMessageCount():
+def getMessageCount(): #Returns message count
     split = buffer.split(':')
     messages = len(split)
     return messages
-def messageInfo(message):
+def messageInfo(message): #Wraps the message in <info> tags before sending so it is interpreted as an [INFO] message by the client
     message = "<info>"+message+"</info>"
     return message
-def messageMsg(message):
+def messageMsg(message): #Wraps the message in <msg> tags before sending so it is interpreted as a [MSG] message by the client
     message = "<msg>"+message+"</msg>"
     return message
-def hashData(unhashedData):
-    hash = hashlib.md5()
+def hashData(unhashedData): #Takes in a piece of data and hashes and formats it so it is ready to be sent
+    hash = hashlib.md5() #Uses the md5 hashing algorithm
     hash.update(unhashedData)
     hashedData = hash.hexdigest()
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
-def verifyHash(data):
+def verifyHash(data): #Takes in hashed data and checks if the hash is the same on the server and client
     split = data.split('-')
     firstHash = split[0]
     secondHash = split[1]
@@ -91,36 +97,41 @@ def verifyHash(data):
         return 1
     else:
         return 0
-def stripHash(data):
+def stripHash(data): #Strips the hash from a message, returning just the payload data
     data = data.split('-', 1)
     stripped = data[1]
     return stripped
 
-timestamp = getTimestamp()
-date = strftime("%a_%d_%b_%Y", gmtime())
-dateString = str(date)
+
 print("Server started.")
 log("\n\n-----------------------------------------"+"Server started at "+str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))+"-----------------------------------------")
 
-def parseInput(data, con):
+
+
+# ---------------------------------------------- #
+
+
+
+def parseInput(data, con): #Handles all messages coming in from the clients
     global buffer
     global usernameTaken
-    print "parsing..."
+    print "Parsing..."
 
-    if verifyHash(data) == 1:
-        data = stripHash(data)
+    if verifyHash(data) == 1: #If the hash can be verified as authentic
+        data = stripHash(data) #Remove the hash data from the message
 
-        if "<servertime>" in data:
+        #Following if statements are checking if a string is a substring of the incoming data and will decide what to do based on what the data contains
+        if "<servertime>" in data: #Returns precise severtime
             formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
             con.send(hashData(messageInfo(str(formatted))))
-        elif "<time>" in data:
+        elif "<time>" in data: #Returns current time in H:M:S
             time = strftime("%H:%M:%S", gmtime())
             timeString = str("Time: " + time)
             con.send(hashData(messageInfo(timeString)))
-        elif "<date>" in data:
+        elif "<date>" in data: #Returns current weekday, and date in D:M:Y
             date=strftime("%a, %d %b %Y", gmtime())
             con.send(hashData(messageInfo(str(date))))
-        elif "<show>" in data:
+        elif "<show>" in data: #Displays previous messages to the client
             count = buffer.count(":")
             count = str(count)
             first_msg = buffer.split(":")
@@ -128,24 +139,24 @@ def parseInput(data, con):
             show = "there are "+ count +" previous messages " + show
             print show
             con.send(hashData(show))
-        elif "<newclient " in data: #<newclient Daniel>
+        elif "<newclient " in data: #Lets a new connecting client to be added to the chat
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
             command = splitMessage[0]
             newclient = splitMessage[1]
             usernameTaken = 0
-            for k,v in clients.items():
+            for k,v in clients.items(): #Checks first to see if the username has been taken
                 if k == newclient:
                     print "Username taken."
                     usernameTaken = 1
                     con.send(hashData(messageInfo("Username has already been taken, closing connection.")))
                     con.send(hashData('<close>'))
             if usernameTaken == 0:
-                clients[newclient] = con
+                clients[newclient] = con # Add to the dictionary of clients
                 messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
                 log("New client \'"+newclient+"\' connected")
 
-        elif "<changenickname " in data: #<changenick Daniel>
+        elif "<changenickname " in data: #e.g <changenickname Daniel> Lets a user change their username
             oldnick = getClientName(con)
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
@@ -155,23 +166,23 @@ def parseInput(data, con):
             clients[newnick] = con # Adds a client value based on new nickname
             log("Nickname changed to " + newnick + " By "+ oldnick)
             messageAll(hashData(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'" )))
-        elif "<chat>" in data: # <msg>Daniel~This is a message</msg>
+        elif "<chat>" in data: # <msg>Daniel~This is a message</msg> #Forwards incoming chat messages to clients
             timestamp = getTimestamp()
             tagless = data[6:-7]
-            buffer = buffer + tagless + ":"
+            buffer = buffer + tagless + ":" #Adds message to the buffer
             splitMessage = tagless.split('~')
             user = splitMessage[0]
             message = splitMessage[1]
             print("Message received")
             log("[MSG]: "+user+": " + message)
-            messageAll(hashData(messageMsg(timestamp+" "+user+": " + message)))
-        elif "<ping>" in data:
+            messageAll(hashData(messageMsg(timestamp+" "+user+": " + message))) #Sends messages to each client
+        elif "<ping>" in data: #Replies to a ping with a pong
             con.send(hashData("<pong>"))
             log("Server pinged by " + getClientName(con))
-        elif "<connected>" in data:
+        elif "<connected>" in data: #Lists the amount and list of users connected
             con.send(hashData(messageInfo(getClientList())))
             log("Connection list called. "+ getClientList())
-        elif "<kick " in data:
+        elif "<kick " in data: #<kick John> #Kicks a client
             kicker = getClientName(con)
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
@@ -179,17 +190,16 @@ def parseInput(data, con):
             user = splitMessage[1]
             usercon = getClientCon(user)
             usercon.send(hashData(messageInfo("[ANNOUNCEMENT] You have been kicked by "+kicker+".")))
-            usercon.send('<close>')
+            usercon.send('<close>') #Tells the client to close the socket connection
             messageAll(hashData(messageInfo("[ANNOUNCEMENT] \'"+user+"\' has been kicked from the chat by \'"+kicker+"\'.")))
-            del clients[user]
-            currentConnections.remove(usercon)
+            del clients[user] #Removes user from client dictionary
+            currentConnections.remove(usercon) #Removes user from currentConnections
             log(user + " has been kicked from the chat by "+ kicker)
-
-        elif "<messages>" in data:
+        elif "<messages>" in data: #Sends the message count to the user
             con.send(hashData(messageInfo("Message count: "+str(getMessageCount()))))
-        elif "<roomname>" in data:
+        elif "<roomname>" in data: #Sends the chat name to the user
             con.send(hashData(messageInfo("You are currently connected to \'"+getChatName()+"\'.")))
-        elif "<changeroomname " in data:
+        elif "<changeroomname " in data: #<changeroomname NewRoom> #Allows users to change the chat name
             oldname = getChatName()
             user = getClientName(con)
             newname = data[16:-1]
@@ -200,14 +210,13 @@ def parseInput(data, con):
     else:
         if debug == 1:
             print("[DEBUG] Hashes do not match!")
-# we a new thread is started from an incoming connection
-# the manageConnection funnction is used to take the input
-# and print it out on the server
-# the data that came in from a client is added to the buffer.
 
-def manageConnection(conn, addr):
+
+
+
+def manageConnection(conn, addr): #A manageConnection() thread will run for each client connecting
     threadData = threading.local()
-    threadData.running = 1
+    threadData.running = 1 #threadData stores a flag of whether the thread should continue running or not
     while(threadData.running == 1):
         global buffer
         global currentConnections
@@ -229,7 +238,9 @@ def manageConnection(conn, addr):
                     singleClient.send(str(data))
 
             except socket.error as error:
-                threadData.running = 0
+                threadData.running = 0 #Tell thread to stop running
+
+
 
 while 1:
     s.listen(1)
@@ -238,6 +249,5 @@ while 1:
     # we will then create a thread for that incoming connection.
     # this will prevent us from blocking the listening process
     # which would prevent further incoming connections
-    t = threading.Thread(target=manageConnection, args = (conn,addr))
-
+    t = threading.Thread(target=manageConnection, args = (conn,addr)) #Start a new thread in manageConnection()
     t.start()
