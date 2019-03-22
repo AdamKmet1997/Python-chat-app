@@ -1,6 +1,7 @@
 import socket
 import threading, Queue
 import hashlib
+import sys
 from time import gmtime, strftime
 import time
 import json
@@ -178,34 +179,34 @@ def parseInput(data, con):
 # the data that came in from a client is added to the buffer.
 
 def manageConnection(conn, addr):
-    global buffer
-    global currentConnections
-    global mylist
-    print 'Connected by', addr
-    # add the new connection to the list of connections
-    currentConnections.append(conn)
+    threadData = threading.local()
+    threadData.running = 1
+    while(threadData.running == 1):
+        global buffer
+        global currentConnections
+        global mylist
+        print 'Connected by', addr
+        # add the new connection to the list of connections
+        currentConnections.append(conn)
 
-    while 1:
-        try:
+        while 1:
+            try:
 
-            data = conn.recv(4096)
-            if data != "":
-                parseInput(data,conn)# Calling the parser
+                data = conn.recv(4096)
+                if data != "":
+                    parseInput(data,conn)# Calling the parser
+                    mylist.append(data)
+                    print mylist
 
+                for singleClient in currentConnections:
+                    singleClient.send(str(data))
 
-            for singleClient in currentConnections:
-                singleClient.send(str(data))
-
-
-        except socket.error as error:
-            print(error)
-            print("Error, removing connection.")
-            print(str(currentConnections))
-            t._Thread_stop()
-            break
-        mylist.append(data)
-        print mylist
-
+            except socket.error as error:
+                print(error)
+                print("Error, removing connection.")
+                print(str(currentConnections))
+                threadData.running = 0
+    print(str(threadData.running))
 
 while 1:
     s.listen(1)
