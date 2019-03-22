@@ -8,7 +8,7 @@ import os
 import json
 
 
-# -------------------- INITIAL SOCKET SETUP  -------------------- #
+# -------------------- INITIAL SOCKET SETUP -------------------- #
 
 
 HOST = '127.0.0.1'
@@ -17,7 +17,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 
 
-# -------------------- DECLARATIONS  -------------------- #
+# -------------------- DECLARATIONS -------------------- #
 
 
 mylist = list()
@@ -33,7 +33,7 @@ usernameTaken = 0
 debug = 0  #Set to 1 to enable debug mode or 0 to disable
 
 
-# -------------------- FUNCTIONS  -------------------- #
+# -------------------- FUNCTIONS -------------------- #
 
 
 
@@ -42,45 +42,56 @@ def log(message): #Takes in a message and logs it to a log file titled after tod
     f = open("Logs/chat_log_"+ dateString +".txt","a+")
     f.write(timestamp+" "+message+"\n")
     f.close()
+
 def getTimestamp(): #Returns current timestamp
     time = strftime("[%H:%M:%S]", gmtime())
     return time
+
 def getChatName(): #Returns name of chatroom
     return chatname
+
 def setChatName(newName): #Sets name of chatroom
     global chatname
     chatname = newName
 def getClientCon(name): #Returns a client connection reference from a client nickname
     clientCon = clients[name]
     return clientCon
+
 def getClientName(con):#Returns a client name from a client connection reference
     clientName =  clients.keys()[clients.values().index(conn)]
     return clientName
+
 def getClientList(): #Returns amount of clients connected and lists them
     population = len(clients)
     message = str(population) + " clients connected. Clients: "
     for client in clients.keys():
         message = message + "\n" + client
     return message
+
 def messageAll(message): #Forwards a message to all users.
     for client in clients.values():
         client.send(message)
+
 def getMessageCount(): #Returns message count
     split = buffer.split(':')
     messages = len(split)
     return messages
+
 def messageInfo(message): #Wraps the message in <info> tags before sending so it is interpreted as an [INFO] message by the client
     message = "<info>"+message+"</info>"
     return message
+
 def messageMsg(message): #Wraps the message in <msg> tags before sending so it is interpreted as a [MSG] message by the client
     message = "<msg>"+message+"</msg>"
     return message
+
 def hashData(unhashedData): #Takes in a piece of data and hashes and formats it so it is ready to be sent
     hash = hashlib.md5() #Uses the md5 hashing algorithm
     hash.update(unhashedData)
     hashedData = hash.hexdigest()
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
+
 def verifyHash(data): #Takes in hashed data and checks if the hash is the same on the server and client
     split = data.split('-')
     firstHash = split[0]
@@ -97,6 +108,7 @@ def verifyHash(data): #Takes in hashed data and checks if the hash is the same o
         return 1
     else:
         return 0
+
 def stripHash(data): #Strips the hash from a message, returning just the payload data
     data = data.split('-', 1)
     stripped = data[1]
@@ -124,13 +136,16 @@ def parseInput(data, con): #Handles all messages coming in from the clients
         if "<servertime>" in data: #Returns precise severtime
             formatted= strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
             con.send(hashData(messageInfo(str(formatted))))
+
         elif "<time>" in data: #Returns current time in H:M:S
             time = strftime("%H:%M:%S", gmtime())
             timeString = str("Time: " + time)
             con.send(hashData(messageInfo(timeString)))
+
         elif "<date>" in data: #Returns current weekday, and date in D:M:Y
             date=strftime("%a, %d %b %Y", gmtime())
             con.send(hashData(messageInfo(str(date))))
+
         elif "<show>" in data: #Displays previous messages to the client
             count = buffer.count(":")
             count = str(count)
@@ -139,6 +154,7 @@ def parseInput(data, con): #Handles all messages coming in from the clients
             show = "there are "+ count +" previous messages " + show
             print show
             con.send(hashData(show))
+
         elif "<newclient " in data: #Lets a new connecting client to be added to the chat
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
@@ -166,6 +182,7 @@ def parseInput(data, con): #Handles all messages coming in from the clients
             clients[newnick] = con # Adds a client value based on new nickname
             log("Nickname changed to " + newnick + " By "+ oldnick)
             messageAll(hashData(messageInfo(oldnick+" has changed their nickname to \'"+newnick+"\'" )))
+
         elif "<chat>" in data: # <msg>Daniel~This is a message</msg> #Forwards incoming chat messages to clients
             timestamp = getTimestamp()
             tagless = data[6:-7]
@@ -176,12 +193,15 @@ def parseInput(data, con): #Handles all messages coming in from the clients
             print("Message received")
             log("[MSG]: "+user+": " + message)
             messageAll(hashData(messageMsg(timestamp+" "+user+": " + message))) #Sends messages to each client
+
         elif "<ping>" in data: #Replies to a ping with a pong
             con.send(hashData("<pong>"))
             log("Server pinged by " + getClientName(con))
+
         elif "<connected>" in data: #Lists the amount and list of users connected
             con.send(hashData(messageInfo(getClientList())))
             log("Connection list called. "+ getClientList())
+
         elif "<kick " in data: #<kick John> #Kicks a client
             kicker = getClientName(con)
             tagless = data[1:-1]
@@ -195,10 +215,13 @@ def parseInput(data, con): #Handles all messages coming in from the clients
             del clients[user] #Removes user from client dictionary
             currentConnections.remove(usercon) #Removes user from currentConnections
             log(user + " has been kicked from the chat by "+ kicker)
+
         elif "<messages>" in data: #Sends the message count to the user
             con.send(hashData(messageInfo("Message count: "+str(getMessageCount()))))
+
         elif "<roomname>" in data: #Sends the chat name to the user
             con.send(hashData(messageInfo("You are currently connected to \'"+getChatName()+"\'.")))
+
         elif "<changeroomname " in data: #<changeroomname NewRoom> #Allows users to change the chat name
             oldname = getChatName()
             user = getClientName(con)
