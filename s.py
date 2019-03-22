@@ -19,6 +19,8 @@ clients = {
 buffer = ""
 chatname = "Year 3 Group chat"
 debug = 0
+newclient = ""
+usernameTaken = 0
 # This is the buffer string
 # when input comes in from a client it is added
 # into the buffer string to be relayed later
@@ -91,6 +93,7 @@ print("Server started.")
 
 def parseInput(data, con):
     global buffer
+    global usernameTaken
     print "parsing..."
 
     if verifyHash(data) == 1:
@@ -111,8 +114,17 @@ def parseInput(data, con):
             splitMessage = tagless.split(' ')
             command = splitMessage[0]
             newclient = splitMessage[1]
-            clients[newclient] = con
-            messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
+            usernameTaken = 0
+
+            for k,v in clients.items():
+                if k == newclient:
+                    print "Username taken."
+                    usernameTaken = 1
+                    con.send(hashData(messageInfo("Username has already been taken, closing connection.")))
+                    con.send(hashData('<close>'))
+            if usernameTaken == 0:
+                clients[newclient] = con
+                messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
         elif "<changenickname " in data: #<changenick Daniel>
             oldnick = getClientName(con)
             tagless = data[1:-1]
