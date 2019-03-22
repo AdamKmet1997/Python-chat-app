@@ -29,8 +29,8 @@ def verifyHash(data):
     hash.update(secondHash)
     secondHash = hash.hexdigest()
     if debug == 1:
-        print("First hash:"+firstHash)
-        print("Second hash: "+secondHash)
+        print("[DEBUG] First hash:"+firstHash)
+        print("[DEBUG] Second hash: "+secondHash)
     if firstHash == secondHash:
         return 1
     else:
