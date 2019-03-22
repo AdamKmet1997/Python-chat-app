@@ -122,13 +122,13 @@ def parseInput(data, con):
             date=strftime("%a, %d %b %Y", gmtime())
             con.send(hashData(messageInfo(str(date))))
         elif "<show>" in data:
+            first_msg = buffer.split(":")
+            show = "\n".join(str(x) for x in first_msg)
             count = buffer.count(":")
             count = str(count)
-            first_msg = buffer.split(":")
-            show = " - ".join(str(x) for x in first_msg)
-            show = "there are "+ count +" previous messages " + show
+            show = "there are "+ count +" previous messages \n" + show
             print show
-            con.send(hashData(show))
+            con.send(hashData(messageInfo(show)))
         elif "<newclient " in data: #<newclient Daniel>
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
