@@ -100,8 +100,7 @@ timestamp = getTimestamp()
 date = strftime("%a_%d_%b_%Y", gmtime())
 dateString = str(date)
 print("Server started.")
-log("\n\n-----------------------------------------"+"Server started at "+str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))
-+"-----------------------------------------")
+log("\n\n-----------------------------------------"+"Server started at "+str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))+"-----------------------------------------")
 
 def parseInput(data, con):
     global buffer
@@ -220,7 +219,7 @@ def manageConnection(conn, addr):
         while 1:
             try:
 
-                data = conn.recv(4096)
+                data = conn.recv(16384)
                 if data != "":
                     parseInput(data,conn)# Calling the parser
                     mylist.append(data)
@@ -230,11 +229,7 @@ def manageConnection(conn, addr):
                     singleClient.send(str(data))
 
             except socket.error as error:
-                print(error)
-                print("Error, removing connection.")
-                print(str(currentConnections))
                 threadData.running = 0
-    print(str(threadData.running))
 
 while 1:
     s.listen(1)
