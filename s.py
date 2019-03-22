@@ -134,6 +134,9 @@ def parseInput(data, con):
                     con.send(hashData('<close>'))
             if usernameTaken == 0:
                 clients[newclient] = con
+                timestamp = getTimestamp()
+                date = strftime("%a_%d_%b_%Y", gmtime())
+                dateString = str(date)
                 messageAll(hashData(messageInfo("[ANNOUNCEMENT] New client "+newclient+" connected. Welcome to \'"+getChatName()+"\'!")))
                 log("New client "+newclient+" at "+ getTimestamp() +"\n")
 

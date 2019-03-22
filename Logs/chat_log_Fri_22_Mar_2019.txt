@@ -1,20 +1,4 @@
-[16:44:53] dylan: yo
-[16:45:02] dylan: This better work
-[16:45:11] adam: this better work alright
-Server started at[16:54:25]
-[16:54:35] Dylan: Sup G's
-Server pinged at[16:55:15]
-Connection list called at[16:55:23] List Value 1 clients connected. Clients: 
-Dylan
-adamKicked from Chat at[16:55:50] by adam
-Server started at [17:02:27]
-Message : [17:02:40] Daniel: Testing123453432
-Chat Room name changed to Dylans Chat at [17:04:44]
-Server started at [17:08:58]
-New Client DylanSeery at [17:09:11]
-Message : [17:09:16] DylanSeery: Hello everyone
-Server pinged at [17:09:21]
-New Client AdamKmet at [17:09:39]
-Message : [17:09:45] AdamKmet: hi 
-Chat Room name changed to python at [17:10:01]
-Nickname changed to daniel By AdamKmet at [17:10:28]
+Server started at [17:49:32]
+Server started at [17:51:30]
+New client Dylan at [17:51:35]
+Message : [17:51:41] Dylan: Hi guys
