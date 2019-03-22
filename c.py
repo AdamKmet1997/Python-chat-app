@@ -141,7 +141,7 @@ def main():
         mylist
 
         while 1:
-            data = s.recv(4096)
+            data = s.recv(16384)
             if debug == 1:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
