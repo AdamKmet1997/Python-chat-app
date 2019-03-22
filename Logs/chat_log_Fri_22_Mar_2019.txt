@@ -1,4 +1,0 @@
-Server started at [17:49:32]
-Server started at [17:51:30]
-New client Dylan at [17:51:35]
-Message : [17:51:41] Dylan: Hi guys
