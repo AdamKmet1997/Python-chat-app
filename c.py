@@ -7,17 +7,28 @@ import time
 import os
 import json
 
+
+# -------------------- DECLARATIONS -------------------- #
+
+
+
 HOST = '127.0.0.1'    # The remote host
 PORT = 50007          # The same port as used by the server
 debug = 0
 
-def hashData(unhashedData):
+
+# -------------------- FUNCTIONS -------------------- #
+
+
+
+def hashData(unhashedData): #Takes in data and hashes it, returning the hash alongside the payload
     hash = hashlib.md5()
     hash.update(unhashedData)
     hashedData = hash.hexdigest()
     finishedData = "<hash "+hashedData+">-"+unhashedData
     return finishedData
-def verifyHash(data):
+
+def verifyHash(data): #Returns 1 if the hash is authentic
     global debug
     split = data.split('-')
     if debug == 1:
@@ -37,12 +48,16 @@ def verifyHash(data):
     else:
         return 0
 
-def stripHash(data):
+def stripHash(data): #Removes hash from data leaving just the payload
     data = data.split('-', 1)
     stripped = data[1]
     return stripped
 
-def main():
+
+
+
+
+def main(): #Main logic
     global debug
     global nickname
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,21 +68,30 @@ def main():
 
     if debug == 1:
         print('[DEBUG] !!!DEBUG MODE ENABLED. SET DEBUG VALUE TO 0 TO DISABLE!!!')
-    def readInputThreaded(so):
+
+
+
+
+    def readInputThreaded(so): #Reads input from the users keyboard
         global nickname
-        while nickname == 'NO_NICKNAME' or len(nickname) < 1 :
+        while nickname == 'NO_NICKNAME' or len(nickname) < 1 : #While nickname isnt set or is empty
             print "Set your nickname:"
             nick = raw_input()
             nickname = nick
-            if len(nickname) > 0:
+            if len(nickname) > 0: #If nickname is set
                 so.sendall(hashData("<newclient "+nickname+">"))
+
+
             print("[HELP] Typing <help> will give you a list of commands!")
 
+
         while 1:
-            text = raw_input()
-            if text == "":
+            text = raw_input() #Take userinput
+
+            if text == "": #Ignore if empty
                 print("[INFO] No message entered.")
-            if "<changecolor>" in text:
+
+            elif "<changecolor>" in text: #Allow the user to change their terminal colors
                 colourcodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f']
                 colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
                 def color(i):
@@ -80,16 +104,20 @@ def main():
                 b = color(textcolor)
                 c = 'color %s%s' % (a, b)
                 os.system(c)
-            if "<colorhelp>" in text:
+
+            elif "<colorhelp>" in text: #Displays help for colors you can choose
                 colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
                 colourprint = ', '.join([c.title() for c in colournames])
-                print "Colors available are: " +colourprint
-            elif "<ping>" in text:
+                print "[INFO] Colors available are: " +colourprint
+
+            elif "<ping>" in text: #If a ping is sent it starts a timer which is only stopped when a "pong" is received, timing the ping
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
+
             elif "<show>" in text:
                 so.sendall(hashData(str(text)))
-            elif "<help>" in text:
+
+            elif "<help>" in text: #Shows all commands to the user
                 print "---------------------------------------------------------"
                 print "|The following commands can be used in this application.|"
                 print "---------------------------------------------------------"
@@ -106,7 +134,9 @@ def main():
                 print "<kick [USER]>\t\t\t\t   <--Kick a user-->"
                 print "<roomname>\t\t\t\t   <--Show roomname-->"
                 print "<changeroomname [NEW_ROOMNAME]>\t\t   <--Edit roomname-->"
-            elif "<changenickname " in text:
+                print "<show>\t\t\t\t\t   <--Displays previous messages-->"
+
+            elif "<changenickname " in text: #Edits the clients nickname locally
                 print("Changing nickname!")
                 tagless = text[1:-1]
                 splitMessage = tagless.split(' ')
@@ -114,51 +144,55 @@ def main():
                 newnick = splitMessage[1]
                 nickname = newnick
                 so.sendall(hashData(str(text)))
-            elif "<close>" in text:
+
+            elif "<close>" in text: #Drops client connection
                 try:
                     so.close()
                     break
                 except Exception:
                     print "Error"
-            elif "<" in text:
+
+            elif "<" in text: #If any other command is here, send it directly to the server
                 so.sendall(hashData(str(text)))
-            else:
+
+            else: #Otherwise if no commands are present interpret as a chat message and forward to the server
                 so.sendall(hashData(str('<chat>'+nickname+'~'+text+'</chat>')))
-            # writeToJsonFile(path,fileName,text)
 
-
-    t = threading.Thread(target=readInputThreaded, args = (s,))
+    t = threading.Thread(target=readInputThreaded, args = (s,)) #Creates a thread which will deal with all readingInput from the clients keyboard
     t.start()
 
 
 
-    '''
-    Thread to read from the server
-    '''
-    def readFromServer(s):
+
+
+
+    def readFromServer(s): #Handles all inbound data from server
         global nickname
         global debug  #Set to 1 to see [data] messages from the server.
         mylist
 
         while 1:
-            data = s.recv(4096)
+            data = s.recv(16384)
             if debug == 1:
                 print ('[DEBUG]: ' +data)
             mylist.append(data)
             if verifyHash(data) == 1:
                 data = stripHash(data)
 
-                if '<msg>' in data:
+                if '<msg>' in data: #If a <msg> comes back, print it as a chat message
                     message = data[5:-6]
                     print("[MSG] " + message)
-                if '<info>' in data:
+
+                if '<info>' in data: #Print message as an [INFO] message
                     message = data[6:-7]
                     print("[INFO] " + message)
-                elif "<pong>" in data:
+
+                elif "<pong>" in data: #Stop ping timer and print results
                     end = datetime.now()
                     timeTaken = end - lastPing
                     print("[INFO] Ping successful. Time taken: " + str(timeTaken))
-                elif "<close>" in data:
+
+                elif "<close>" in data: #Drop connection
                     try:
                         s.close()
                         break
@@ -167,7 +201,9 @@ def main():
             else:
                 if debug == 1:
                     print("[DEBUG] HASHES DO NOT MATCH")
-    t = threading.Thread(target=readFromServer, args = (s,))
+
+
+    t = threading.Thread(target=readFromServer, args = (s,)) #Additional thread for reading server input
     t.start()
 
 main()
