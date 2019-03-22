@@ -43,6 +43,7 @@ def stripHash(data):
 
 def main():
     global debug
+    global nickname
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     mylist = list()
@@ -53,15 +54,16 @@ def main():
         print('[DEBUG] !!!DEBUG MODE ENABLED. SET DEBUG VALUE TO 0 TO DISABLE!!!')
     def readInputThreaded(so):
         global nickname
-        print "Set your nickname"
-        nick = raw_input()
-        nickname = nick
-        so.sendall(hashData("<newclient "+nickname+">"))
-        print("[HELP] Typing <help> will give you a list of commands!")
+        while nickname == 'NO_NICKNAME':
+            print "Set your nickname:"
+            nick = raw_input()
+            nickname = nick
+            so.sendall(hashData("<newclient "+nickname+">"))
+            print("[HELP] Typing <help> will give you a list of commands!")
 
         while 1:
             text = raw_input()
-            if "" in text:
+            if text == "":
                 print("[INFO] No message entered.")
             elif "<ping>" in text:
                 lastPing = datetime.now()
