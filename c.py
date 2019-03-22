@@ -87,6 +87,8 @@ def main():
             elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
+            elif "<show>" in text:
+                so.sendall(hashData(str(text)))
             elif "<help>" in text:
                 print "---------------------------------------------------------"
                 print "|The following commands can be used in this application.|"
@@ -120,7 +122,6 @@ def main():
                 so.sendall(hashData(str(text)))
             else:
                 so.sendall(hashData(str('<chat>'+nickname+'~'+text+'</chat>')))
-
             # writeToJsonFile(path,fileName,text)
 
 
