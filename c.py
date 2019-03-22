@@ -163,7 +163,8 @@ def main():
                     except Exception:
                         print "Error"
             else:
-                print("HASHES DO NOT MATCH")
+                if debug == 1:
+                    print("[DEBUG] HASHES DO NOT MATCH")
     t = threading.Thread(target=readFromServer, args = (s,))
     t.start()
 
