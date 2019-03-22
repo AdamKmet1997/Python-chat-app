@@ -4,6 +4,7 @@ import hashlib
 from time import gmtime, strftime
 from datetime import datetime
 import time
+import os
 import json
 
 HOST = '127.0.0.1'    # The remote host
