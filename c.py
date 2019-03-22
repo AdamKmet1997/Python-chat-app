@@ -67,7 +67,7 @@ def main():
             text = raw_input()
             if text == "":
                 print("[INFO] No message entered.")
-            if "<change_color>" in text:
+            if "<changecolor>" in text:
                 colourcodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f']
                 colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
                 def color(i):
@@ -80,10 +80,10 @@ def main():
                 b = color(textcolor)
                 c = 'color %s%s' % (a, b)
                 os.system(c)
-            if "<color_help>" in text:
+            if "<colorhelp>" in text:
                 colournames = ['black', 'blue', 'green', 'aqua', 'red', 'purple', 'yellow', 'white', 'grey', 'light blue', 'light green', 'light aqua', 'light red', 'light purple', 'light yellow', 'bright white']
                 colourprint = ', '.join([c.title() for c in colournames])
-                print "Colors available are " +colourprint
+                print "Colors available are: " +colourprint
             elif "<ping>" in text:
                 lastPing = datetime.now()
                 so.sendall(hashData(str(text)))
@@ -91,6 +91,9 @@ def main():
                 print "---------------------------------------------------------"
                 print "|The following commands can be used in this application.|"
                 print "---------------------------------------------------------"
+                print "<help>\t\t\t\t\t   <--Displays all help commands-->"
+                print "<colorhelp>\t\t\t\t   <--Displays all information for changing colors-->"
+                print "<changecolor>\t\t\t\t   <--Edit the colors on your application (Use <colorhelp>)-->"
                 print "<time>\t\t\t\t\t   <--Prints the local time in format H:M:S-->"
                 print "<date>\t\t\t\t\t   <--Prints the local date time in format DDD, D:MMM:YYYY-->"
                 print "<servertime>\t\t\t\t   <--Gets a precise server time and date-->"
@@ -101,6 +104,7 @@ def main():
                 print "<kick [USER]>\t\t\t\t   <--Kick a user-->"
                 print "<roomname>\t\t\t\t   <--Show roomname-->"
                 print "<changeroomname [NEW_ROOMNAME]>\t\t   <--Edit roomname-->"
+
             elif "<changenickname " in text:
                 print("Changing nickname!")
                 tagless = text[1:-1]
