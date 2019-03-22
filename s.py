@@ -39,6 +39,7 @@ debug = 0  #Set to 1 to enable debug mode or 0 to disable
 
 def log(message): #Takes in a message and logs it to a log file titled after todays date.
     timestamp = str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))
+    dateString = str(date)
     f = open("Logs/chat_log_"+ dateString +".txt","a+")
     f.write(timestamp+" "+message+"\n")
     f.close()
@@ -114,7 +115,8 @@ def stripHash(data): #Strips the hash from a message, returning just the payload
     stripped = data[1]
     return stripped
 
-
+date = str(strftime("%a_%d_%b_%Y", gmtime()))
+dateString = str(date)
 print("Server started.")
 log("\n\n-----------------------------------------"+"Server started at "+str(strftime("[%d %b %Y - %H:%M:%S]", gmtime()))+"-----------------------------------------")
 
@@ -145,14 +147,22 @@ def parseInput(data, con): #Handles all messages coming in from the clients
         elif "<date>" in data: #Returns current weekday, and date in D:M:Y
             date=strftime("%a, %d %b %Y", gmtime())
             con.send(hashData(messageInfo(str(date))))
+
         elif "<show>" in data:
-            first_msg = buffer.split(":")
-            show = "\n".join(str(x) for x in first_msg)
+            timestamp = getTimestamp()
+            messages = buffer.split(":", buffer.count(':')-1) #Splits buffer into strings for every : in it minus 1
+            for msg in range(len(messages)): #For every message in our messages
+                messages[msg] = messages[msg].replace('~',': ')
+                messages[msg] = str(timestamp) +" [MSG] " + messages[msg]
+            show = "\n".join(str(x) for x in messages)
+            show = show[:-1] #Removes trailing ':' from buffer string
             count = buffer.count(":")
             count = str(count)
-            show = "there are "+ count +" previous messages \n" + show
+            show = "There are "+ count +" previous messages. \n" + show
+            show.replace('~',': ')
             print show
             con.send(hashData(messageInfo(show)))
+
         elif "<newclient " in data: #<newclient Daniel>
             tagless = data[1:-1]
             splitMessage = tagless.split(' ')
